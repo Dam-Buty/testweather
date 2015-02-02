@@ -1,0 +1,168 @@
+{
+    "list": [
+        {
+            "rain": 5,
+            "dt": 1422878400,
+            "deg": 109,
+            "humidity": 95,
+            "temp": {
+                "max": 279.85,
+                "day": 279.85,
+                "night": 277.41,
+                "min": 277.41,
+                "morn": 279.85,
+                "eve": 279.85
+            },
+            "speed": 4.07,
+            "clouds": 92,
+            "pressure": 1011.38,
+            "weather": [
+                {
+                    "icon": "10d",
+                    "main": "Rain",
+                    "id": 501,
+                    "description": "pluies modérées"
+                }
+            ]
+        },
+        {
+            "dt": 1422964800,
+            "deg": 36,
+            "humidity": 100,
+            "temp": {
+                "max": 278.37,
+                "day": 278.37,
+                "night": 274.48,
+                "min": 274.48,
+                "morn": 275.24,
+                "eve": 276.88
+            },
+            "speed": 2.01,
+            "clouds": 8,
+            "pressure": 1011.87,
+            "weather": [
+                {
+                    "icon": "02d",
+                    "main": "Clear",
+                    "id": 800,
+                    "description": "ensoleillé"
+                }
+            ]
+        },
+        {
+            "dt": 1423051200,
+            "deg": 1,
+            "humidity": 99,
+            "temp": {
+                "max": 278.28,
+                "day": 276.56,
+                "night": 275.12,
+                "min": 271.77,
+                "morn": 271.77,
+                "eve": 277.3
+            },
+            "speed": 6.87,
+            "clouds": 8,
+            "pressure": 1020.12,
+            "weather": [
+                {
+                    "icon": "02d",
+                    "main": "Clear",
+                    "id": 800,
+                    "description": "ensoleillé"
+                }
+            ]
+        },
+        {
+            "dt": 1423137600,
+            "deg": 360,
+            "humidity": 87,
+            "temp": {
+                "max": 277.41,
+                "day": 277.36,
+                "night": 272.77,
+                "min": 272.77,
+                "morn": 273.23,
+                "eve": 275.65
+            },
+            "speed": 7.36,
+            "clouds": 0,
+            "pressure": 1027.25,
+            "weather": [
+                {
+                    "icon": "01d",
+                    "main": "Clear",
+                    "id": 800,
+                    "description": "ensoleillé"
+                }
+            ]
+        },
+        {
+            "rain": 0.24,
+            "dt": 1423224000,
+            "deg": 60,
+            "humidity": 0,
+            "temp": {
+                "max": 275.35,
+                "day": 275.35,
+                "night": 272.59,
+                "min": 272.59,
+                "morn": 273.14,
+                "eve": 274.26
+            },
+            "speed": 3.82,
+            "clouds": 77,
+            "snow": 0.36,
+            "pressure": 1030.34,
+            "weather": [
+                {
+                    "icon": "13d",
+                    "main": "Snow",
+                    "id": 600,
+                    "description": "légères neiges"
+                }
+            ]
+        },
+        {
+            "dt": 1423310400,
+            "deg": 123,
+            "humidity": 0,
+            "temp": {
+                "max": 276.49,
+                "day": 276.49,
+                "night": 273,
+                "min": 272.99,
+                "morn": 272.99,
+                "eve": 275.92
+            },
+            "speed": 4.23,
+            "clouds": 32,
+            "snow": 0.13,
+            "pressure": 1034.6,
+            "weather": [
+                {
+                    "icon": "13d",
+                    "main": "Snow",
+                    "id": 600,
+                    "description": "légères neiges"
+                }
+            ]
+        }
+    ],
+    "cod": "200",
+    "city": {
+        "coord": {
+            "lat": 44.840439,
+            "lon": -0.5805
+        },
+        "country": "FR",
+        "sys": {
+            "population": 0
+        },
+        "name": "Bordeaux",
+        "id": 3031582,
+        "population": 0
+    },
+    "message": 1.5e-2,
+    "cnt": 6
+}
