@@ -1,0 +1,57 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box; }
+
+body {
+  text-align: center;
+  width: 100vw;
+  height: 100vh; }
+
+.graph {
+  width: 600px;
+  height: 50px;
+  text-align: center; }
+
+.strikeout {
+  fill: none;
+  stroke: black;
+  stroke-width: 2px;
+  stroke-linecap: round;
+  stroke-dasharray: 604,604; }
+
+section {
+  position: relative;
+  width: 100%;
+  height: 100%; }
+  section#full > header {
+    position: absolute;
+    top: 0;
+    left: 0; }
+  section#full .wind {
+    position: absolute;
+    top: 0;
+    right: 0; }
+  section#full .temp {
+    width: 100%;
+    height: 100%; }
+  section#full forecast-widget:nth-of-type(1) .forecast {
+    left: 0%; }
+  section#full forecast-widget:nth-of-type(2) .forecast {
+    left: 20%; }
+  section#full forecast-widget:nth-of-type(3) .forecast {
+    left: 40%; }
+  section#full forecast-widget:nth-of-type(4) .forecast {
+    left: 60%; }
+  section#full forecast-widget:nth-of-type(5) .forecast {
+    left: 80%; }
+  section#full .forecast {
+    position: absolute;
+    bottom: 0;
+    width: 20%; }
+    section#full .forecast header {
+      text-align: left; }
+      section#full .forecast header img {
+        float: right; }
+
+/*# sourceMappingURL=weather.css.map */

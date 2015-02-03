@@ -32,11 +32,11 @@
       "main": "Clear",
       "description": "ensoleillé",
       "icon": "01d"
-      }],
-      "speed": 7.36,
-      "deg": 360,
-      "clouds": 0
-      }, {
+    }],
+    "speed": 7.36,
+    "deg": 360,
+    "clouds": 0
+  }, {
     "dt": 1423051200,
     "temp": {
       "day": 3.68,
@@ -53,13 +53,13 @@
       "main": "Snow",
       "description": "légères neiges",
       "icon": "13d"
-      }],
-      "speed": 6.87,
-      "deg": 1,
-      "clouds": 8,
-      "rain": 4,
-      "snow": 1
-      },{
+    }],
+    "speed": 6.87,
+    "deg": 1,
+    "clouds": 8,
+    "rain": 4,
+    "snow": 1
+  }, {
     "dt": 1422878400,
     "temp": {
       "day": 6.1,

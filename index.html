@@ -4,11 +4,12 @@
   <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="stylesheet" href="css/weather.css" media="screen" type="text/css"/>
-  <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.3.8/angular.min.js"></script>
-  <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.3.8/angular-animate.min.js"></script>
+  <!-- <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.3.8/angular.min.js"></script>
+  <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.3.8/angular-animate.min.js"></script> -->
+  <script src="vendor/angular.min.js"></script>
 </head>
 <body ng-controller="WeatherController">
-  <section id="form">
+  <section id="form" ng-show="page == 'form'">
     Est-ce qu'il fait beau à <input type="text" ng-value="city"/><button id="localize"> ?</button>
     <button id="go" ng-click="go()">Go</button>
   </section>
@@ -17,7 +18,10 @@
     <h2 ng-repeat="feature in minimal.features">{{ feature }}</h2>
   </section>
   <section id="full" ng-show="page == 'full'">
-
+    <header>{{ today.dtHuman }} à <input type="text" ng-value="city"/></header>
+    <wind-widget deg="today.deg" speed="today.speed"></wind-widget>
+    <temp-widget temp="today.temp" description="{{today.weather[0].description}}" ng-if="page == 'full'"></temp-widget>
+    <forecast-widget ng-repeat="day in forecast"></forecast-widget>
   </section>
   <script src="js/weather.js"></script>
 </body>

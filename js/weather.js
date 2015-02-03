@@ -1,6 +1,9 @@
 (function () {
 
   angular.module("weather", [])
+  .config(function($logProvider){
+    $logProvider.debugEnabled(true);
+  })
   .controller("WeatherController",
   [ "$window", "$scope", "$http", "$timeout",
   function($window, $scope, $http, $timeout) {
@@ -20,9 +23,11 @@
     };
 
     $scope.api = {
-      mock: true,
+      mock: false,
       baseUrl: "http://api.openweathermap.org/data/2.5/forecast/daily",
       mockUrl: "test/data.dev.json",
+
+      data: undefined,
 
       params: {
         lang: "fr",
@@ -34,8 +39,9 @@
         lon: ""
       },
 
-      // getParams retourne l'objet params sans les paramètres vides/undefined
-      // pour avoir un vrai 404 sur une ville non trouvée, et pas le point [0°,0°]
+      // Si on laisse lat et lon à vide, et que la ville n'est pas trouvée,
+      // l'API renvoie le point [0°,0°] au lieu d'un code 404.
+      // getParams sert à renvoyer l'objet params sans les paramètres vides/undefined
       getParams: function() {
         var filtered = {};
 
@@ -53,6 +59,7 @@
 
       call: function() {
         var url;
+        var self = this;
 
         if (this.mock) {
           url = this.mockUrl;
@@ -67,11 +74,9 @@
         return $http.get(url, {
           params: this.getParams()
         }).success(function(data) {
-          $scope.api.data = data;
+          self.data = data;
         });
-      },
-
-      data: undefined
+      }
     };
 
     $scope.go = function() {
@@ -79,7 +84,8 @@
       .success(function(data) {
         $scope.process();
 
-        $scope.page = "minimal";
+        $scope.page = "full";
+        // $scope.page = "minimal";
       });
     };
 
@@ -112,14 +118,16 @@
     $scope.process = function() {
       var days = $scope.api.data.list;
 
+      $scope.city = $scope.api.data.city.name + "," + $scope.api.data.city.country;
+
       // Formatage des dates
       for(var i = 0;i < days.length;i++) {
         var day = days[i];
 
         day["dtObject"] = new Date(day.dt * 1000);
         day["dtHuman"] = ("00" + day.dtObject.getDate()).slice(-2) + "/" +
-                       ("00" + (day.dtObject.getMonth() + 1)).slice(-2) + "/" +
-                       day.dtObject.getFullYear();
+                        ("00" + (day.dtObject.getMonth() + 1)).slice(-2) + "/" +
+                        day.dtObject.getFullYear();
       }
 
       // on duplique l'array avec slice pour garder l'original intact dans $scope.api
@@ -141,10 +149,15 @@
         $scope.minimal.features.push("on se pèle");
       }
 
+      if ($scope.today.temp.day > 30) {
+        $scope.minimal.features.push("on est en plein cagnard");
+      }
+
       if ($scope.today.humidity > 85) {
         $scope.minimal.features.push("il fait humide");
       }
 
+      // On naturalise un peu le langage
       var firstFeature = $scope.minimal.features[0];
       var lastFeature = $scope.minimal.features[$scope.minimal.features.length - 1];
 
@@ -157,7 +170,63 @@
         $scope.minimal.features[0] = "En plus " + firstFeature;
       }
 
-      $scope.minimal.features[$scope.minimal.features.length - 1] = "et " + lastFeature;
-    }
-  }]);
+      $scope.minimal.features[$scope.minimal.features.length - 1] = "et " + lastFeature + ".";
+    };
+  }])
+  .directive('windWidget', function() {
+    return {
+      restrict: 'E',
+      scope: {
+        deg: '=',
+        speed: '='
+      },
+      templateUrl: 'views/wind-widget.html'
+    };
+  })
+  .directive('tempWidget', function() {
+    return {
+      restrict: 'E',
+      scope: {
+        temp: '='
+      },
+      templateUrl: 'views/temp-widget.html'
+    };
+  })
+  .directive('tempGraph', function() {
+    return {
+      restrict: 'E',
+      type: 'svg',
+      templateNamespace: "svg",
+      scope: {
+        temp: '='
+      },
+      templateUrl: 'views/temp-graph.svg',
+      controller: function($scope) {
+        var temp = $scope.temp;
+        var ecart = temp.max - temp.min;
+
+        // On calcule les coordonées des 4 points du graphe
+        var points = [
+          "0," + (45 - Math.floor((temp.morn - temp.min) / ecart * 40)),
+          "200," + (45 - Math.floor((temp.day - temp.min) / ecart * 40)),
+          "400," + (45 - Math.floor((temp.eve - temp.min) / ecart * 40)),
+          "600," + (45 - Math.floor((temp.night - temp.min) / ecart * 40))
+        ];
+
+        // Ici on construit le path pour l'élément SVG qui dessine le graphe
+        // On positionne le curseur au point de départ et on crée une courbe vers les 3 autres points
+        var depart = points.shift();
+        $scope.path = "M " + depart + " C " + points.join(" ");
+      }
+    };
+  })
+  .directive('forecastWidget', function() {
+    return {
+      restrict: 'E',
+      templateUrl: 'views/forecast-widget.html',
+      controller: function($scope) {
+        $scope.icon = "http://openweathermap.org/img/w/" + $scope.day.weather[0].icon + ".png";
+      }
+    };
+  })
 })();
