@@ -1,19 +1,23 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" ng-app="weather">
 <head>
   <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="stylesheet" href="css/weather.css" media="screen" type="text/css"/>
+  <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.3.8/angular.min.js"></script>
+  <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.3.8/angular-animate.min.js"></script>
 </head>
-<body>
+<body ng-controller="WeatherController">
   <section id="form">
-    Est-ce qu'il fait beau à <input id="city" type="text"/><button id="localize"> ?
-    <button id="go">Go</button>
+    Est-ce qu'il fait beau à <input type="text" ng-value="city"/><button id="localize"> ?</button>
+    <button id="go" ng-click="go()">Go</button>
   </section>
-  <section>
-    
+  <section id="minimal" ng-show="page == 'minimal'">
+    <h1>{{ minimal.message }}</h1>
+    <h2 ng-repeat="feature in minimal.features">{{ feature }}</h2>
   </section>
+  <section id="full" ng-show="page == 'full'">
 
-  <script src="js/jquery-2.1.3.min.js"></script>
+  </section>
   <script src="js/weather.js"></script>
 </body>
