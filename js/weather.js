@@ -5,8 +5,8 @@
     $logProvider.debugEnabled(true);
   })
   .controller("WeatherController",
-  [ "$window", "$scope", "$http", "$timeout",
-  function($window, $scope, $http, $timeout) {
+  [ "$window", "$scope", "$http", "$timeout", "$sce",
+  function($window, $scope, $http, $timeout, $sce) {
     $scope.page = "form";
 
     $scope.city = "Bordeaux";
@@ -89,7 +89,6 @@
       });
     };
 
-
     // {
     //   "dt": 1423051200,
     //   "deg": 1,
@@ -117,6 +116,15 @@
 
     $scope.process = function() {
       var days = $scope.api.data.list;
+      var dayNames = [
+        "dimanche",
+        "lundi",
+        "mardi",
+        "mercredi",
+        "jeudi",
+        "vendredi",
+        "samedi"
+      ]
 
       $scope.city = $scope.api.data.city.name + "," + $scope.api.data.city.country;
 
@@ -128,6 +136,7 @@
         day["dtHuman"] = ("00" + day.dtObject.getDate()).slice(-2) + "/" +
                         ("00" + (day.dtObject.getMonth() + 1)).slice(-2) + "/" +
                         day.dtObject.getFullYear();
+        day["dtName"] = dayNames[day.dtObject.getDay()];
       }
 
       // on duplique l'array avec slice pour garder l'original intact dans $scope.api
@@ -171,6 +180,10 @@
       }
 
       $scope.minimal.features[$scope.minimal.features.length - 1] = "et " + lastFeature + ".";
+
+      // document.getElementsByTagName("video")[0].addEventListener("canplay", function(e) {
+      //   e.currentTarget.play();
+      // });
     };
   }])
   .directive('windWidget', function() {
@@ -187,9 +200,15 @@
     return {
       restrict: 'E',
       scope: {
-        temp: '='
+        temp: '=',
+        descr: "=",
+        mini: "=",
+        dash: "="
       },
-      templateUrl: 'views/temp-widget.html'
+      templateUrl: 'views/temp-widget.html',
+      controller: function($scope) {
+        // console.log($scope);
+      }
     };
   })
   .directive('tempGraph', function() {
@@ -198,19 +217,37 @@
       type: 'svg',
       templateNamespace: "svg",
       scope: {
-        temp: '='
+        temp: '=',
+        mini: "=",
+        dash: "="
       },
       templateUrl: 'views/temp-graph.svg',
       controller: function($scope) {
         var temp = $scope.temp;
         var ecart = temp.max - temp.min;
 
+        var width, height, margin, step;
+
+        if ($scope.mini) {
+          width = 80;
+          height = 16;
+          margin = 3;
+        } else {
+          width = 600;
+          height = 50;
+          margin = 5;
+        }
+
+        step = Math.floor(width / 3);
+        max = height - margin;
+        amplitude = max - margin;
+
         // On calcule les coordonées des 4 points du graphe
         var points = [
-          "0," + (45 - Math.floor((temp.morn - temp.min) / ecart * 40)),
-          "200," + (45 - Math.floor((temp.day - temp.min) / ecart * 40)),
-          "400," + (45 - Math.floor((temp.eve - temp.min) / ecart * 40)),
-          "600," + (45 - Math.floor((temp.night - temp.min) / ecart * 40))
+          step * 0 + "," + (max - Math.floor((temp.morn - temp.min) / ecart * amplitude)),
+          step * 1 + "," + (max - Math.floor((temp.day - temp.min) / ecart * amplitude)),
+          step * 2 + "," + (max - Math.floor((temp.eve - temp.min) / ecart * amplitude)),
+          step * 3 + "," + (max - Math.floor((temp.night - temp.min) / ecart * amplitude))
         ];
 
         // Ici on construit le path pour l'élément SVG qui dessine le graphe
@@ -226,6 +263,15 @@
       templateUrl: 'views/forecast-widget.html',
       controller: function($scope) {
         $scope.icon = "http://openweathermap.org/img/w/" + $scope.day.weather[0].icon + ".png";
+        $scope.hovering = false;
+
+        $scope.mouseover = function() {
+          $scope.hovering = true;
+        };
+
+        $scope.mouseleave = function() {
+          $scope.hovering = false;
+        }
       }
     };
   })
