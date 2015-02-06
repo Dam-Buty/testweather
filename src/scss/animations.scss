@@ -1,0 +1,21 @@
+
+/*  Rideau  */
+
+@keyframes clignote {
+    0% { opacity: 1; }
+
+    30% { opacity: 0; }
+
+    45% { opacity: 1; }
+
+    55% { opacity: 1; }
+
+    70% { opacity: 0; }
+
+    99% { opacity: 1; }
+}
+
+@keyframes tourne {
+    1% { transform: rotate(1deg); }
+    99% { transform: rotate(359deg); }
+}

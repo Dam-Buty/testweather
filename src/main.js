@@ -7,9 +7,10 @@
   .controller("WeatherController",
   [ "$window", "$scope", "$http", "$timeout", "$sce",
   function($window, $scope, $http, $timeout, $sce) {
+    $scope.loading = false;
     $scope.page = "form";
 
-    $scope.city = "Bordeaux";
+    $scope.city = "London,UK";
     $scope.lat = undefined;
     $scope.lon = undefined;
 
@@ -67,7 +68,7 @@
           url = this.baseUrl;
         }
 
-        if ($scope.city !== undefined) {
+        if (this.params.lat === "" && this.params.lon === "") {
           this.params.q = $scope.city;
         }
 
@@ -75,18 +76,50 @@
           params: this.getParams()
         }).success(function(data) {
           self.data = data;
+          self.params.q = "";
+          self.params.lat = "";
+          self.params.lon = "";
         });
       }
     };
 
     $scope.go = function() {
+      $scope.loading = true;
       $scope.api.call()
       .success(function(data) {
         $scope.process();
-
-        $scope.page = "full";
-        // $scope.page = "minimal";
       });
+    };
+
+    $scope.localize = function() {
+      var self = this;
+      $scope.loading = true;
+
+      var remoteLocalize = function() {
+        $http.get("https://freegeoip.net/json/")
+        .success(function(data) {
+          $scope.api.params.q = "";
+          $scope.api.params.lat = data.latitude;
+          $scope.api.params.lon = data.longitude;
+          $scope.go();
+        })
+        .error(function() {
+          // flash error in input
+        });
+      };
+
+      if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(function(position) {
+          $scope.api.params.q = "";
+          $scope.api.params.lat = position.coords.latitude;
+          $scope.api.params.lon = position.coords.longitude;
+          $scope.api.go();
+        }, function() {
+          remoteLocalize();
+        });
+      } else {
+        remoteLocalize();
+      }
     };
 
     $scope.process = function() {
@@ -102,6 +135,7 @@
       ];
 
       $scope.city = $scope.api.data.city.name + "," + $scope.api.data.city.country;
+      $scope.minimal.features = [];
 
       // Formatage des dates
       for(var i = 0;i < days.length;i++) {
@@ -111,7 +145,7 @@
         day["dtHuman"] = ("00" + day.dtObject.getDate()).slice(-2) + "/" +
                         ("00" + (day.dtObject.getMonth() + 1)).slice(-2) + "/" +
                         day.dtObject.getFullYear();
-        day["dtName"] = dayNames[day.dtObject.getDay()];
+        day["dtJour"] = dayNames[day.dtObject.getDay()];
       }
 
       // on duplique l'array avec slice pour garder l'original intact dans $scope.api
@@ -156,8 +190,11 @@
 
       $scope.minimal.features[$scope.minimal.features.length - 1] = "et " + lastFeature + ".";
 
-      // document.getElementsByTagName("video")[0].addEventListener("canplay", function(e) {
-      //   e.currentTarget.play();
+      // document.getElementsByTagName("video")[0].addEventListener("loadeddata", function(e) {
+        $scope.page = "full";
+        // $scope.page = "minimal";
+        $scope.loading = false;
+        // $scope.$apply();
       // });
     };
   }]);

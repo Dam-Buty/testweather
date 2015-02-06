@@ -9,10 +9,8 @@
 </head>
 <body ng-controller="WeatherController">
   <section id="form" ng-show="page == 'form'">
-    <div id="container-form">
-      Est-ce qu'il fait beau à <input type="text" ng-value="city"/>
-      <button id="localize">?</button><br/>
-      <button id="go" ng-click="go()">Go</button>
+    <div id="container-front">
+      Est-ce qu'il fait beau à <search-widget></search-widget>
     </div>
   </section>
   <section id="minimal" ng-show="page == 'minimal'">
@@ -32,7 +30,7 @@
       <source ng-src="video/dawsonfalls.cut.mp4" type="video/mp4">
       <source ng-src="video/dawsonfalls.cut.webm" type="video/webm">
     </video>
-    <header>{{ today.dtHuman }} à <input type="text" ng-value="city"/></header>
+    <header>{{ today.dtJour }} {{ today.dtHuman }} à <search-widget></search-widget></header>
     <wind-widget deg="today.deg" speed="today.speed"></wind-widget>
     <temp-widget temp="today.temp" descr="today.weather[0].description" mini="false" dash="604" ng-if="page == 'full'"></temp-widget>
     <forecast-widget ng-repeat="day in forecast"></forecast-widget>

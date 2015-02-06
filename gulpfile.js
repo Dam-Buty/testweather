@@ -32,6 +32,7 @@ gulp.task('imagemin', function() {
   gulp.src(src + "img/*.png")
     .pipe(changed(dst + "img"))
     .pipe(imagemin())
+    .pipe(chmod(664))
     .pipe(gulp.dest(dst + "img"));
 });
 
@@ -52,9 +53,9 @@ gulp.task('scripts', function() {
     ], { base: src })
     .pipe(concat('main.js'))
     // .pipe(gulp.dest(dst))
-    .pipe(stripDebug())
+    // .pipe(stripDebug())
     .pipe(ngAnnotate())
-    .pipe(uglify())
+    // .pipe(uglify())
     .pipe(chmod(664))
     .pipe(gulp.dest(dst));
 });
