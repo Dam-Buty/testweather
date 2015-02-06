@@ -286,7 +286,7 @@ q.directive("ngView",v);q.directive("ngView",A);v.$inject=["$route","$anchorScro
       message: "",
       features: [],
       prediction: ""
-    };
+    }; 
 
     $scope.api = {
       mock: false,

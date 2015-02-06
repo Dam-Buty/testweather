@@ -21,7 +21,7 @@
       message: "",
       features: [],
       prediction: ""
-    };
+    }; 
 
     $scope.api = {
       mock: false,
