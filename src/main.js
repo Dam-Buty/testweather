@@ -1,12 +1,9 @@
 (function () {
 
   angular.module("weather", [])
-  .config(function($logProvider){
-    $logProvider.debugEnabled(true);
-  })
   .controller("WeatherController",
-  [ "$window", "$scope", "$http", "$timeout", "$sce",
-  function($window, $scope, $http, $timeout, $sce) {
+  [ "$window", "$scope", "$http", "$timeout",
+  function($window, $scope, $http, $timeout) {
     $scope.loading = false;
     $scope.page = "form";
 
@@ -21,7 +18,7 @@
       message: "",
       features: [],
       prediction: ""
-    }; 
+    };
 
     $scope.api = {
       mock: false,
@@ -96,7 +93,7 @@
       $scope.loading = true;
 
       var remoteLocalize = function() {
-        $http.get("https://freegeoip.net/json/")
+        $http.get("https://freegeoip.net/jsonjson/")
         .success(function(data) {
           $scope.api.params.q = "";
           $scope.api.params.lat = data.latitude;
@@ -113,7 +110,7 @@
           $scope.api.params.q = "";
           $scope.api.params.lat = position.coords.latitude;
           $scope.api.params.lon = position.coords.longitude;
-          $scope.api.go();
+          $scope.go();
         }, function() {
           remoteLocalize();
         });
@@ -136,6 +133,8 @@
 
       $scope.city = $scope.api.data.city.name + "," + $scope.api.data.city.country;
       $scope.minimal.features = [];
+
+      window.location.hash = $scope.city;
 
       // Formatage des dates
       for(var i = 0;i < days.length;i++) {
@@ -197,5 +196,10 @@
         // $scope.$apply();
       // });
     };
+
+    if (window.location.hash !== "") {
+      $scope.city = window.location.hash.split("#")[1];
+      $scope.go();
+    }
   }]);
 })();

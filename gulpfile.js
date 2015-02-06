@@ -38,7 +38,7 @@ gulp.task('imagemin', function() {
 
 // minify new or changed HTML pages
 gulp.task('htmlpage', function() {
-  gulp.src([src + "**/*.html", src + "views/*.svg"], {base: src})
+  gulp.src([src + "**/*.html", src + "partials/*.svg"], {base: src})
     .pipe(changed(dst))
     .pipe(minifyHTML())
     .pipe(gulp.dest(dst));
@@ -49,9 +49,9 @@ gulp.task('scripts', function() {
     gulp.src([
         // src + "vendor/angular.js",
         src + "vendor/angular.min.js",
-        src + "vendor/angular-route.min.js",
         src + "main.js",
-        src + "views/*.js"
+        src + "pages/*.js",
+        src + "partials/*.js"
     ], { base: src })
     .pipe(concat('main.js'))
     // .pipe(gulp.dest(dst))
