@@ -32,7 +32,7 @@ angular.module('weather')
       var temp = $scope.temp;
       var ecart = temp.max - temp.min;
 
-      var width, height, margin, step;
+      var width, height, margin, step, pointsWidth;
 
       // Définit la grille selon la valeur de l'attribut mini
       if ($scope.mini) {
@@ -50,18 +50,27 @@ angular.module('weather')
       amplitude = max - margin;
 
       // On calcule les coordonées des 4 points du graphe
-      var points = [
-        step * 0 + "," + (max - Math.floor((temp.morn - temp.min) / ecart * amplitude)),
-        step * 1 + "," + (max - Math.floor((temp.day - temp.min) / ecart * amplitude)),
-        step * 2 + "," + (max - Math.floor((temp.eve - temp.min) / ecart * amplitude)),
-        step * 3 + "," + (max - Math.floor((temp.night - temp.min) / ecart * amplitude))
+      $scope.pointsWidth = 3;
+
+      $scope.points = [
+        [step * 0 + margin , (max - Math.floor((temp.morn - temp.min) / ecart * amplitude))],
+        [step * 1 , (max - Math.floor((temp.day - temp.min) / ecart * amplitude))],
+        [step * 2 , (max - Math.floor((temp.eve - temp.min) / ecart * amplitude))],
+        [step * 3 - margin , (max - Math.floor((temp.night - temp.min) / ecart * amplitude))]
       ];
 
       // Ici on construit le path pour l'élément SVG qui dessine le graphe
-      var depart = points.shift(); // On récupère le point de départ
 
-      $scope.path = "M " + depart +             // La commande M bouge le curseur aux coordonées de départ
-                    " C " + points.join(" ");   // La commande C crée une courbe passant par le reste des points
+      var pathPoints = $scope.points.slice();
+      var depart = pathPoints.shift(); // On récupère le point de départ
+
+      // La commande M bouge le curseur aux coordonées de départ
+      // La commande C crée une courbe passant par le reste des points
+      $scope.path = "M " + depart.join(",") + " C";
+
+      for (var i = 0;i < pathPoints.length;i++) {
+        $scope.path += " " + pathPoints[i].join(",");
+      }
     }
   };
 });

@@ -47,7 +47,9 @@ gulp.task('htmlpage', function() {
 // JS concat, strip debugging and minify
 gulp.task('scripts', function() {
     gulp.src([
-        src + "vendor/angular.js",
+        // src + "vendor/angular.js",
+        src + "vendor/angular.min.js",
+        src + "vendor/angular-route.min.js",
         src + "main.js",
         src + "views/*.js"
     ], { base: src })
@@ -80,6 +82,9 @@ gulp.task("assets", function() {
 gulp.task('default', ['imagemin', 'htmlpage', 'scripts', 'styles', 'assets'], function() {
   // watch for HTML changes
   gulp.watch(src + '**/*.html', function() {
+    gulp.run('htmlpage');
+  });
+  gulp.watch(src + '**/*.svg', function() {
     gulp.run('htmlpage');
   });
 

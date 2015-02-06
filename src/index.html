@@ -18,15 +18,15 @@
     <h2 ng-repeat="feature in minimal.features">{{ feature }}</h2>
   </section>
   <section id="full" ng-show="page == 'full'">
-    <video class="bg-video" ng-if="today.weather[0].main == 'Rain'" autoplay loop muted>
+    <video class="bg-video" ng-if="today.weather[0].main == 'Rain'" autoplay loop muted preload>
       <source ng-src="video/Rain.cut.mp4" type="video/mp4">
       <source ng-src="video/Rain.cut.webm" type="video/webm">
     </video>
-    <video class="bg-video" ng-if="today.weather[0].main == 'Snow'" autoplay loop muted>
+    <video class="bg-video" ng-if="today.weather[0].main == 'Snow'" autoplay loop muted preload>
       <source ng-src="video/fallingsnow.cut.mp4" type="video/mp4">
       <source ng-src="video/fallingsnow.cut.webm" type="video/webm">
     </video>
-    <video class="bg-video" ng-if="today.weather[0].main != 'Rain' && today.weather[0].main != 'Snow'" loop autoplay muted>
+    <video class="bg-video" ng-if="today.weather[0].main != 'Rain' && today.weather[0].main != 'Snow'" loop autoplay muted preload>
       <source ng-src="video/dawsonfalls.cut.mp4" type="video/mp4">
       <source ng-src="video/dawsonfalls.cut.webm" type="video/webm">
     </video>
