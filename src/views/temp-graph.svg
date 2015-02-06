@@ -1,0 +1,17 @@
+<svg class="graph">
+  <g id="layer1">
+    <path class="strikeout" ng-attr-d="{{ path }}">
+      <!--
+      Hack pour dessiner progressivement le graphe. Prend en attribut la longueur du dasharray
+      qui est le tableau contenant tous les "coups de pinceau" du SVG.
+      Il faut garder cette valeur synchro avec stroke-dasharray dans le CSS (mixin custom-temp).
+      Valeurs déterminées à la main avec document.getElementsByClassName("strikeout")[x].getTotalLength()
+      - 88 pour le mini
+      - 604 pour le graphe normal
+      TODO DB automatiser la détection du dasharray
+      -->
+      <animate attributeName="stroke-dashoffset" ng-attr-from="{{ dash }}" to="0" dur="1s" begin="rect.click;0s"/>
+    </path>
+  </g>
+  <rect id="rect" width="100%" height="100%" fill="none" pointer-events="all"/>
+</svg>
