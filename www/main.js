@@ -351,7 +351,7 @@ e.$validators.maxlength=function(a,c){return 0>f||e.$isEmpty(c)||c.length<=f}}}}
           $scope.go();
         })
         .error(function() {
-          alert("Le service de géolocalisation n'est pas disponible. Il va falloir entrer une ville à la main!")
+          alert("Le service de géolocalisation n'est pas disponible. Il va falloir entrer une ville à la main!");
         });
       };
 
@@ -437,11 +437,13 @@ e.$validators.maxlength=function(a,c){return 0>f||e.$isEmpty(c)||c.length<=f}}}}
         $scope.minimal.features[0] = "En plus " + firstFeature;
       }
 
-      $scope.minimal.features[$scope.minimal.features.length - 1] = "et " + lastFeature + ".";
+      if ($scope.minimal.features.length > 1) {
+        $scope.minimal.features[$scope.minimal.features.length - 1] = "et " + lastFeature + ".";
+      }
 
       // document.getElementsByTagName("video")[0].addEventListener("loadeddata", function(e) {
-        $scope.page = "full";
-        // $scope.page = "minimal";
+        // $scope.page = "full";
+        $scope.page = "minimal";
         $scope.loading = false;
         // $scope.$apply();
       // });
@@ -508,12 +510,35 @@ Dépend de
 ---------------------------------*/
 
 angular.module('weather')
-.directive('resultMinimal', function() {
+.directive('resultMinimal', ["$timeout", function($timeout) {
   return {
     restrict: 'E',
-    templateUrl: 'pages/result-minimal.html'
+    templateUrl: 'pages/result-minimal.html',
+    scope: {
+      minimal: '=',
+      city: '='
+    },
+    controller: ["$scope", function($scope) {
+      $scope.currentFeature = "";
+      $scope.currentIndex = 0;
+      $scope.delay = 1500;
+
+      $scope.tick = function() {
+        $timeout(function() {
+          if ($scope.currentIndex < $scope.minimal.features.length) {
+            $scope.currentFeature = $scope.minimal.features[$scope.currentIndex];
+            $scope.currentIndex++;
+            $scope.tick();
+          } else {
+            $scope.$parent.$parent.page = "full";
+          }
+        }, $scope.delay);
+      };
+
+      $scope.tick();
+    }]
   };
-});
+}]);
 
 })();
 

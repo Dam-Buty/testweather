@@ -108,7 +108,17 @@ section {
   }
 
   &#minimal {
+    font-family: "Arial";
+    font-size: 3em;
+    margin-top: 2em;
 
+    header {
+      font-size: 0.75em;
+    }
+
+    h2 {
+      animation: vanish 1500ms ease-in-out 0 infinite alternate;
+    }
   }
 
   &#full {

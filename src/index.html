@@ -9,6 +9,6 @@
 </head>
 <body ng-controller="WeatherController" ng-view>
   <front-form></front-form>
-  <result-minimal></result-minimal>
+  <result-minimal ng-if="page == 'minimal'" minimal="minimal" city="city"></result-minimal>
   <result-full></result-full>
 </body>

@@ -101,7 +101,7 @@
           $scope.go();
         })
         .error(function() {
-          alert("Le service de géolocalisation n'est pas disponible. Il va falloir entrer une ville à la main!")
+          alert("Le service de géolocalisation n'est pas disponible. Il va falloir entrer une ville à la main!");
         });
       };
 
@@ -187,11 +187,13 @@
         $scope.minimal.features[0] = "En plus " + firstFeature;
       }
 
-      $scope.minimal.features[$scope.minimal.features.length - 1] = "et " + lastFeature + ".";
+      if ($scope.minimal.features.length > 1) {
+        $scope.minimal.features[$scope.minimal.features.length - 1] = "et " + lastFeature + ".";
+      }
 
       // document.getElementsByTagName("video")[0].addEventListener("loadeddata", function(e) {
-        $scope.page = "full";
-        // $scope.page = "minimal";
+        // $scope.page = "full";
+        $scope.page = "minimal";
         $scope.loading = false;
         // $scope.$apply();
       // });
