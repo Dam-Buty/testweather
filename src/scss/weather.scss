@@ -51,21 +51,21 @@ body {
   height: 100vh;
   font-family: 'Open Sans Condensed', sans-serif;
   overflow: hidden;
-}
 
-input {
-  font-size: 1em;
-  border: none;
-  border-radius: 5px;
-  border-bottom: 5px dotted #ABABAB;
-  outline: 0;
-  font-family: 'Open Sans Condensed', sans-serif;
-  background-color: rgba(200, 200, 200, 0.35);
-  text-align: center;
+  input {
+    font-size: 1em;
+    border: none;
+    border-radius: 5px;
+    border-bottom: 5px dotted #ABABAB;
+    outline: 0;
+    font-family: 'Open Sans Condensed', sans-serif;
+    background-color: rgba(200, 200, 200, 0.35);
+    text-align: center;
+  }
 }
 
 .search-container {
-  .go {
+  .btn-go {
     border-radius: 5px;
     border: 1px solid rgba(200, 200, 200, 0.35);;
     background: #ABABAB;
@@ -117,7 +117,15 @@ section {
     }
 
     h2 {
-      animation: vanish 1500ms ease-in-out 0 infinite alternate;
+      animation: pulse 1500ms ease-in-out 0 infinite alternate;
+    }
+
+    .vanish {
+      animation: vanish 1500ms ease-in-out 0;
+    }
+
+    .appear {
+      animation: appear 1500ms ease-in-out 0;
     }
   }
 
@@ -127,6 +135,7 @@ section {
       position: absolute;
       top: 0;
       left: 0;
+      padding: 10px;
 
       text-transform: capitalize;
 
@@ -185,7 +194,7 @@ section {
       z-index: 1;
       background-color: rgba(200, 200, 200, 0.75);
 
-      transition: all 400ms ease-in 0;
+      transition: height 800ms ease-in 0;
 
       header {
         text-align: left;
@@ -206,14 +215,42 @@ section {
       }
     }
 
-    video {
+    .bg {
       position: absolute;
       top: 0;
       left: 0;
       width: 100%;
       height: 100%;
-      background: #000;
       z-index: 0;
+
+      &.video {
+        background: #000;
+      }
+
+      &.photo {
+
+        background-size: cover;
+
+        &.clear {
+          background-image: url(../img/Clear.prod.jpg);
+        }
+
+        &.snow {
+          background-image: url(../img/Snow.prod.jpg);
+        }
+
+        &.rain {
+          background-image: url(../img/Rain.prod.jpg);
+        }
+      }
+    }
+
+    #controls {
+      position: absolute;
+      top: 50%;
+      right: 0;
+      z-index: 1;
+      background-color: rgba(200, 200, 200, 0.75);
     }
   }
 }

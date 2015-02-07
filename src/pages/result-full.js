@@ -5,6 +5,7 @@ Result full v1.0
 Affiche le résultat entier & les forecasts
 
 Dépend de
+- background
 - wind-widget
 - search-widget
 - temp-widget

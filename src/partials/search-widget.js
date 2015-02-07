@@ -9,7 +9,7 @@ angular.module('weather')
 .directive('searchWidget', function() {
   return {
     restrict: 'E',
-    templateUrl: 'views/search-widget.html'
+    templateUrl: 'partials/search-widget.html'
   };
 });
 

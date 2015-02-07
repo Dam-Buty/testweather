@@ -27,7 +27,7 @@ angular.module('weather')
       mini: "=",
       dash: "="
     },
-    templateUrl: 'views/temp-graph.svg',
+    templateUrl: 'partials/temp-graph.svg',
     controller: function($scope) {
       var temp = $scope.temp;
       var ecart = temp.max - temp.min;

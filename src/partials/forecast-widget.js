@@ -16,7 +16,7 @@ angular.module('weather')
 .directive('forecastWidget', function() {
   return {
     restrict: 'E',
-    templateUrl: 'views/forecast-widget.html',
+    templateUrl: 'partials/forecast-widget.html',
     controller: function($scope) {
       $scope.icon = "http://openweathermap.org/img/w/" + $scope.day.weather[0].icon + ".png";
       $scope.hovering = false;

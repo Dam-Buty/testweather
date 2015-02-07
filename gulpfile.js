@@ -29,7 +29,7 @@ gulp.task('jshint', function() {
 
 // minify new images
 gulp.task('imagemin', function() {
-  gulp.src(src + "img/*.png")
+  gulp.src(src + "img/*.prod.*")
     .pipe(changed(dst + "img"))
     .pipe(imagemin())
     .pipe(chmod(664))

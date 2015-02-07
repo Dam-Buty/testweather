@@ -16,12 +16,24 @@
 }
 
 @keyframes tourne {
-    1% { transform: rotate(1deg); }
-    99% { transform: rotate(359deg); }
+    from { transform: rotate(1deg); }
+    to { transform: rotate(359deg); }
 }
 
-@keyframes vanish {
+@keyframes pulse {
     0% { opacity: 0; }
     50% { opacity: 1; }
     100% { opacity: 0; }
+}
+
+@keyframes vanish {
+    0% { opacity: 1; }
+    50% { opacity: 1; }
+    100% { opacity: 0; }
+}
+
+@keyframes appear {
+    0% { opacity: 0; }
+    50% { opacity: 1; }
+    100% { opacity: 1; }
 }

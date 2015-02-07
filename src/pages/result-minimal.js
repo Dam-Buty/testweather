@@ -21,12 +21,21 @@ angular.module('weather')
       $scope.currentFeature = "";
       $scope.currentIndex = 0;
       $scope.delay = 1500;
+      $scope.last = false;
+      $scope.first = true;
 
       $scope.tick = function() {
         $timeout(function() {
           if ($scope.currentIndex < $scope.minimal.features.length) {
             $scope.currentFeature = $scope.minimal.features[$scope.currentIndex];
             $scope.currentIndex++;
+
+            if ($scope.currentIndex == $scope.minimal.features.length) {
+              $scope.last = true;
+            }
+
+            $scope.first = false;
+
             $scope.tick();
           } else {
             $scope.$parent.$parent.page = "full";

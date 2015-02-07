@@ -1,10 +1,9 @@
-# testweather
-
-# # Changelog
+# Changelog
 
 v0.3 :
 ======
 
+- Routage minimal :
 - Ajoute $scope.city dans la barre d'adresse pour pouvoir bookmarker sa ville
 
 v0.2 :

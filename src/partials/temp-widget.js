@@ -29,7 +29,7 @@ angular.module('weather').directive('tempWidget', function() {
       mini: "=",
       dash: "="
     },
-    templateUrl: 'views/temp-widget.html'
+    templateUrl: 'partials/temp-widget.html'
   };
 });
 })();

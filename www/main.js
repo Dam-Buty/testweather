@@ -270,6 +270,9 @@ e.$validators.maxlength=function(a,c){return 0>f||e.$isEmpty(c)||c.length<=f}}}}
       prediction: ""
     };
 
+    $scope.mode = "photo";
+    $scope.state = "";
+
     $scope.api = {
       mock: false,
       baseUrl: "http://api.openweathermap.org/data/2.5/forecast/daily",
@@ -429,16 +432,37 @@ e.$validators.maxlength=function(a,c){return 0>f||e.$isEmpty(c)||c.length<=f}}}}
       var lastFeature = $scope.minimal.features[$scope.minimal.features.length - 1];
 
       // Finalement, est-ce qu'il fait beau ou pas?
-      if ($scope.today.weather[0].main === "Clear") {
+      if ($scope.today.weather[0].id >= 800) {
         $scope.minimal.message = "OUI";
-        $scope.minimal.features[0] = "Mais " + firstFeature;
+        if ($scope.minimal.features.length > 0) {
+          $scope.minimal.features[0] = "Mais " + firstFeature;
+        } else {
+          $scope.minimal.features[0] = "Sors les lunettes de soleil";
+        }
       } else {
         $scope.minimal.message = "NON";
-        $scope.minimal.features[0] = "En plus " + firstFeature;
+        if ($scope.minimal.features.length > 0) {
+          $scope.minimal.features[0] = "En plus " + firstFeature;
+        } else {
+          $scope.minimal.features[0] = "Je vais passer ma journée sur Netflix";
+        }
       }
 
       if ($scope.minimal.features.length > 1) {
         $scope.minimal.features[$scope.minimal.features.length - 1] = "et " + lastFeature + ".";
+      }
+
+      // On choisit le background pour le mode photo-bg
+      switch($scope.today.weather[0].main) {
+        case "Snow":
+          $scope.state = "snow";
+          break;
+        case "Rain":
+          $scope.state = "rain";
+          break;
+        default:
+          $scope.state = "clear";
+          break;
       }
 
       // document.getElementsByTagName("video")[0].addEventListener("loadeddata", function(e) {
@@ -483,6 +507,7 @@ Result full v1.0
 Affiche le résultat entier & les forecasts
 
 Dépend de
+- background
 - wind-widget
 - search-widget
 - temp-widget
@@ -522,12 +547,21 @@ angular.module('weather')
       $scope.currentFeature = "";
       $scope.currentIndex = 0;
       $scope.delay = 1500;
+      $scope.last = false;
+      $scope.first = true;
 
       $scope.tick = function() {
         $timeout(function() {
           if ($scope.currentIndex < $scope.minimal.features.length) {
             $scope.currentFeature = $scope.minimal.features[$scope.currentIndex];
             $scope.currentIndex++;
+
+            if ($scope.currentIndex == $scope.minimal.features.length) {
+              $scope.last = true;
+            }
+
+            $scope.first = false;
+
             $scope.tick();
           } else {
             $scope.$parent.$parent.page = "full";
@@ -539,6 +573,27 @@ angular.module('weather')
     }]
   };
 }]);
+
+})();
+
+(function () {
+
+/*---------------------------------
+Background v1.0
+Fournit le sélecteur de background (photo ou vidéo selon le mode)
+---------------------------------*/
+
+angular.module('weather')
+.directive('background', function() {
+  return {
+    restrict: 'E',
+    scope: {
+      mode: '=',
+      state: "="
+    },
+    templateUrl: 'partials/background.html',
+  };
+});
 
 })();
 
@@ -560,7 +615,7 @@ angular.module('weather')
 .directive('forecastWidget', function() {
   return {
     restrict: 'E',
-    templateUrl: 'views/forecast-widget.html',
+    templateUrl: 'partials/forecast-widget.html',
     controller: ["$scope", function($scope) {
       $scope.icon = "http://openweathermap.org/img/w/" + $scope.day.weather[0].icon + ".png";
       $scope.hovering = false;
@@ -589,7 +644,7 @@ angular.module('weather')
 .directive('searchWidget', function() {
   return {
     restrict: 'E',
-    templateUrl: 'views/search-widget.html'
+    templateUrl: 'partials/search-widget.html'
   };
 });
 
@@ -624,7 +679,7 @@ angular.module('weather')
       mini: "=",
       dash: "="
     },
-    templateUrl: 'views/temp-graph.svg',
+    templateUrl: 'partials/temp-graph.svg',
     controller: ["$scope", function($scope) {
       var temp = $scope.temp;
       var ecart = temp.max - temp.min;
@@ -705,7 +760,7 @@ angular.module('weather').directive('tempWidget', function() {
       mini: "=",
       dash: "="
     },
-    templateUrl: 'views/temp-widget.html'
+    templateUrl: 'partials/temp-widget.html'
   };
 });
 })();
@@ -728,7 +783,7 @@ angular.module('weather').directive('windWidget', function() {
       deg: '=',
       speed: '='
     },
-    templateUrl: 'views/wind-widget.html'
+    templateUrl: 'partials/wind-widget.html'
   };
 });
 })();

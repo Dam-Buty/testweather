@@ -20,6 +20,9 @@
       prediction: ""
     };
 
+    $scope.mode = "photo";
+    $scope.state = "";
+
     $scope.api = {
       mock: false,
       baseUrl: "http://api.openweathermap.org/data/2.5/forecast/daily",
@@ -179,16 +182,37 @@
       var lastFeature = $scope.minimal.features[$scope.minimal.features.length - 1];
 
       // Finalement, est-ce qu'il fait beau ou pas?
-      if ($scope.today.weather[0].main === "Clear") {
+      if ($scope.today.weather[0].id >= 800) {
         $scope.minimal.message = "OUI";
-        $scope.minimal.features[0] = "Mais " + firstFeature;
+        if ($scope.minimal.features.length > 0) {
+          $scope.minimal.features[0] = "Mais " + firstFeature;
+        } else {
+          $scope.minimal.features[0] = "Sors les lunettes de soleil";
+        }
       } else {
         $scope.minimal.message = "NON";
-        $scope.minimal.features[0] = "En plus " + firstFeature;
+        if ($scope.minimal.features.length > 0) {
+          $scope.minimal.features[0] = "En plus " + firstFeature;
+        } else {
+          $scope.minimal.features[0] = "Je vais passer ma journée sur Netflix";
+        }
       }
 
       if ($scope.minimal.features.length > 1) {
         $scope.minimal.features[$scope.minimal.features.length - 1] = "et " + lastFeature + ".";
+      }
+
+      // On choisit le background pour le mode photo-bg
+      switch($scope.today.weather[0].main) {
+        case "Snow":
+          $scope.state = "snow";
+          break;
+        case "Rain":
+          $scope.state = "rain";
+          break;
+        default:
+          $scope.state = "clear";
+          break;
       }
 
       // document.getElementsByTagName("video")[0].addEventListener("loadeddata", function(e) {

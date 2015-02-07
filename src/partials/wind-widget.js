@@ -16,7 +16,7 @@ angular.module('weather').directive('windWidget', function() {
       deg: '=',
       speed: '='
     },
-    templateUrl: 'views/wind-widget.html'
+    templateUrl: 'partials/wind-widget.html'
   };
 });
 })();
