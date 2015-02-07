@@ -343,7 +343,7 @@ e.$validators.maxlength=function(a,c){return 0>f||e.$isEmpty(c)||c.length<=f}}}}
       $scope.loading = true;
 
       var remoteLocalize = function() {
-        $http.get("https://freegeoip.net/jsonjson/")
+        $http.get("https://freegeoip.net/json/")
         .success(function(data) {
           $scope.api.params.q = "";
           $scope.api.params.lat = data.latitude;
@@ -351,7 +351,7 @@ e.$validators.maxlength=function(a,c){return 0>f||e.$isEmpty(c)||c.length<=f}}}}
           $scope.go();
         })
         .error(function() {
-          // flash error in input
+          alert("Le service de géolocalisation n'est pas disponible. Il va falloir entrer une ville à la main!")
         });
       };
 
