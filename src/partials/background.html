@@ -14,6 +14,6 @@
 </div>
 <div ng-if="mode == 'photo'" ng-class="['bg', 'photo', state]"></div>
 <div id="bg-controls" ng-if="!mobile">
-  <div ng-click="mode = 'video'">Mode Deluxe</div>
-  <div ng-click="mode = 'photo'">Mode Normal</div>
+  <div ng-click="setMode('video')">Mode Deluxe</div>
+  <div ng-click="setMode('photo')">Mode Normal</div>
 </div>

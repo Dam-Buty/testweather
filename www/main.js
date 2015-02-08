@@ -275,8 +275,7 @@ e.$validators.maxlength=function(a,c){return 0>f||e.$isEmpty(c)||c.length<=f}}}}
       features: [],
       prediction: ""
     };
-
-    $scope.mode = "photo";
+    
     $scope.state = "";
 
     $scope.api = {
@@ -594,16 +593,21 @@ angular.module('weather')
   return {
     restrict: 'E',
     scope: {
-      mode: '=',
       state: "="
     },
     templateUrl: 'partials/background.html',
     controller: ["$scope", function($scope) {
+      $scope.mode = "photo";
+
       if (screen.width <= 1024) {
         $scope.mobile = true;
       } else {
         $scope.mobile = false;
       }
+
+      $scope.setMode = function(mode) {
+        $scope.mode = mode;
+      };
     }]
   };
 });

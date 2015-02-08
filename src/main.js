@@ -25,8 +25,7 @@
       features: [],
       prediction: ""
     };
-
-    $scope.mode = "photo";
+    
     $scope.state = "";
 
     $scope.api = {
