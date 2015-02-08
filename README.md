@@ -1,5 +1,9 @@
 # Changelog
 
+v0.5 :
+======
+- Ajout du fond photo + sélection de mode
+
 v0.3 :
 ======
 
