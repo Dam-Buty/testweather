@@ -264,6 +264,12 @@ e.$validators.maxlength=function(a,c){return 0>f||e.$isEmpty(c)||c.length<=f}}}}
     $scope.today = undefined;
     $scope.forecast = [];
 
+    $scope.mobile = false;
+    // Détection de mobile façon homme des cavernes
+    if (screen.width < 1024) {
+      $scope.mobile = true;
+    }
+
     $scope.minimal = {
       message: "",
       features: [],
@@ -592,6 +598,13 @@ angular.module('weather')
       state: "="
     },
     templateUrl: 'partials/background.html',
+    controller: ["$scope", function($scope) {
+      if (screen.width <= 1024) {
+        $scope.mobile = true;
+      } else {
+        $scope.mobile = false;
+      }
+    }]
   };
 });
 
@@ -655,6 +668,7 @@ angular.module('weather')
 /*---------------------------------
 Temp graph v1.0
 Affiche un graphe des différentes températures de la journée
+Ne s'affiche pas sur mobile
 
 Attributs
 @ temp : un objet contenant les températures en degrés
@@ -681,47 +695,52 @@ angular.module('weather')
     },
     templateUrl: 'partials/temp-graph.svg',
     controller: ["$scope", function($scope) {
-      var temp = $scope.temp;
-      var ecart = temp.max - temp.min;
-
-      var width, height, margin, step, pointsWidth;
-
-      // Définit la grille selon la valeur de l'attribut mini
-      if ($scope.mini) {
-        width = 80;
-        height = 16;
-        margin = 3;
+      if (screen.width <= 1024) {
+        $scope.mobile = true;
       } else {
-        width = 600;
-        height = 50;
-        margin = 5;
-      }
+        $scope.mobile = false;
+        var temp = $scope.temp;
+        var ecart = temp.max - temp.min;
 
-      step = Math.floor(width / 3); // distance horizontale entre les points du graphe
-      max = height - margin;
-      amplitude = max - margin;
+        var width, height, margin, step, pointsWidth;
 
-      // On calcule les coordonées des 4 points du graphe
-      $scope.pointsWidth = 3;
+        // Définit la grille selon la valeur de l'attribut mini
+        if ($scope.mini) {
+          width = 80;
+          height = 16;
+          margin = 3;
+        } else {
+          width = 600;
+          height = 50;
+          margin = 5;
+        }
 
-      $scope.points = [
-        [step * 0 + margin , (max - Math.floor((temp.morn - temp.min) / ecart * amplitude))],
-        [step * 1 , (max - Math.floor((temp.day - temp.min) / ecart * amplitude))],
-        [step * 2 , (max - Math.floor((temp.eve - temp.min) / ecart * amplitude))],
-        [step * 3 - margin , (max - Math.floor((temp.night - temp.min) / ecart * amplitude))]
-      ];
+        step = Math.floor(width / 3); // distance horizontale entre les points du graphe
+        max = height - margin;
+        amplitude = max - margin;
 
-      // Ici on construit le path pour l'élément SVG qui dessine le graphe
+        // On calcule les coordonées des 4 points du graphe
+        $scope.pointsWidth = 3;
 
-      var pathPoints = $scope.points.slice();
-      var depart = pathPoints.shift(); // On récupère le point de départ
+        $scope.points = [
+          [step * 0 + margin , (max - Math.floor((temp.morn - temp.min) / ecart * amplitude))],
+          [step * 1 , (max - Math.floor((temp.day - temp.min) / ecart * amplitude))],
+          [step * 2 , (max - Math.floor((temp.eve - temp.min) / ecart * amplitude))],
+          [step * 3 - margin , (max - Math.floor((temp.night - temp.min) / ecart * amplitude))]
+        ];
 
-      // La commande M bouge le curseur aux coordonées de départ
-      // La commande C crée une courbe passant par le reste des points
-      $scope.path = "M " + depart.join(",") + " C";
+        // Ici on construit le path pour l'élément SVG qui dessine le graphe
 
-      for (var i = 0;i < pathPoints.length;i++) {
-        $scope.path += " " + pathPoints[i].join(",");
+        var pathPoints = $scope.points.slice();
+        var depart = pathPoints.shift(); // On récupère le point de départ
+
+        // La commande M bouge le curseur aux coordonées de départ
+        // La commande C crée une courbe passant par le reste des points
+        $scope.path = "M " + depart.join(",") + " C";
+
+        for (var i = 0;i < pathPoints.length;i++) {
+          $scope.path += " " + pathPoints[i].join(",");
+        }
       }
     }]
   };

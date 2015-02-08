@@ -1,0 +1,11 @@
+
+@import '../scss/mixins.scss';
+
+#form {
+  font-size: 3em;
+
+  #container-front {
+    position: absolute;
+    @include center-all;
+  }
+}

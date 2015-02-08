@@ -1,0 +1,33 @@
+
+@import '../scss/mixins.scss';
+
+.search-container {
+  text-align: center;
+
+  .btn-go {
+    border-radius: 5px;
+    border: 1px solid rgba(200, 200, 200, 0.35);;
+    background: #ABABAB;
+    color: #FFF;
+    margin-top: 0.5em;
+    cursor: pointer;
+
+    &:hover {
+      animation: clignote 3s ease-in-out 0 infinite alternate;
+    }
+  }
+
+  img {
+    width: 1em;
+    cursor: pointer;
+    margin-top: 0.5em;
+
+    &:hover {
+      animation: clignote 3s ease-in-out 0 infinite alternate;
+    }
+
+    &.loading {
+      animation: tourne 3s ease-in-out 0 infinite alternate;
+    }
+  }
+}

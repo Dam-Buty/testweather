@@ -14,6 +14,12 @@
     $scope.today = undefined;
     $scope.forecast = [];
 
+    $scope.mobile = false;
+    // Détection de mobile façon homme des cavernes
+    if (screen.width < 1024) {
+      $scope.mobile = true;
+    }
+
     $scope.minimal = {
       message: "",
       features: [],

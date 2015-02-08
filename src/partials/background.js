@@ -14,6 +14,13 @@ angular.module('weather')
       state: "="
     },
     templateUrl: 'partials/background.html',
+    controller: function($scope) {
+      if (screen.width <= 1024) {
+        $scope.mobile = true;
+      } else {
+        $scope.mobile = false;
+      }
+    }
   };
 });
 

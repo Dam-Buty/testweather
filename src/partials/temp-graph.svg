@@ -1,4 +1,4 @@
-<svg class="graph">
+<svg class="graph" ng-if="!mobile">
   <g id="layer1">
     <path class="strikeout" ng-attr-d="{{ path }}">
       <!--

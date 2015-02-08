@@ -1,0 +1,19 @@
+
+@mixin center-all {
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%,-50%);
+}
+
+@mixin custom-temp($width, $height, $dash) {
+  .temp {
+    .graph {
+      width: $width !important;
+      height: $height !important;
+
+      .strikeout {
+        stroke-dasharray:$dash,$dash;
+      }
+    }
+  }
+}

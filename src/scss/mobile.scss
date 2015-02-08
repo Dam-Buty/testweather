@@ -1,0 +1,17 @@
+
+
+@media all and (max-width: 1024px) {
+  body {
+    font-size: 0.6em !important;
+  }
+
+  .forecast img {
+    width: 30px;
+  }
+}
+
+@media all and (max-width: 1024px) and (orientation: landscape) {
+  #full>*>.temp {
+    top: 0 !important;
+  }
+}

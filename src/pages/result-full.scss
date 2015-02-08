@@ -1,0 +1,31 @@
+
+@import '../scss/mixins.scss';
+
+#full {
+
+  &>header {
+    position: absolute;
+    top: 0;
+    left: 0;
+    padding: 10px;
+
+    text-transform: capitalize;
+
+    z-index: 1;
+    background-color: rgba(200, 200, 200, 0.75);
+  }
+
+  &>.container-temp {    
+    .temp {
+        position: absolute;
+        font-size: 3em;
+        z-index: 1;
+        background-color: rgba(200, 200, 200, 0.75);
+        padding: 30px;
+        border-radius: 15px;
+        @include center-all;
+    }
+
+    @include custom-temp(600px, 50px, 604);
+  }
+}

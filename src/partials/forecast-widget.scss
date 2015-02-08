@@ -1,0 +1,42 @@
+
+@import '../scss/mixins.scss';
+
+@for $i from 1 through 5 {
+  forecast-widget:nth-of-type(#{$i}) {
+    .forecast {
+      left: 20% * ($i - 1);
+    }
+  }
+}
+
+.forecast {
+  position: absolute;
+  bottom: 0;
+  width: 20%;
+  font-size: 1em;
+  text-transform: capitalize;
+
+  padding: 10px;
+  border: 1px solid black;
+  border-bottom: none;
+  border-top-left-radius: 3px;
+  border-top-right-radius: 3px;
+
+  z-index: 1;
+  background-color: rgba(200, 200, 200, 0.75);
+
+  transition: height 800ms ease-in 0;
+
+  header {
+    text-align: left;
+
+    img {
+      float: right;
+    }
+  }
+
+  .container-temp {
+    position: relative;
+    @include custom-temp(80px, 16px, 88);
+  }
+}

@@ -2,6 +2,8 @@
   <background mode="mode" state="state"></background>
   <header>{{ today.dtJour }} {{ today.dtHuman }} à <search-widget></search-widget></header>
   <wind-widget deg="today.deg" speed="today.speed"></wind-widget>
-  <temp-widget temp="today.temp" descr="today.weather[0].description" mini="false" dash="604" ng-if="page == 'full'"></temp-widget>
+  <div class="container-temp">
+    <temp-widget temp="today.temp" descr="today.weather[0].description" mini="false" dash="604" ng-if="page == 'full'"></temp-widget>
+  </div>
   <forecast-widget ng-repeat="day in forecast"></forecast-widget>
 </section>

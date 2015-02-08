@@ -1,0 +1,17 @@
+
+@import '../scss/mixins.scss';
+
+.wind {
+  position: absolute;
+  top: 0;
+  right: 0;
+  text-align: right;
+
+  z-index: 1;
+  background-color: rgba(200, 200, 200, 0.75);
+
+  img {
+    width: 20%;
+    transition: transform 800ms ease-in-out 1s;
+  }
+}
