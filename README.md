@@ -1,5 +1,10 @@
 # Changelog
 
+v0.6 :
+======
+
+- Petits tweaks pour être lisible sur mobile/tablette
+
 v0.5 :
 ======
 - Ajout du fond photo + sélection de mode
