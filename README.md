@@ -1,5 +1,11 @@
 # Changelog
 
+v0.6.1 :
+========
+
+- Correction des bugs première session de recette
+- Revue du design
+
 v0.6 :
 ======
 
