@@ -4,13 +4,11 @@
 @keyframes clignote {
     0% { opacity: 1; }
 
-    30% { opacity: 0; }
-
-    45% { opacity: 1; }
+    30% { opacity: 0.4; }
 
     55% { opacity: 1; }
 
-    70% { opacity: 0; }
+    70% { opacity: 0.4; }
 
     99% { opacity: 1; }
 }

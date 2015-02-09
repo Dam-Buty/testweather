@@ -21,11 +21,12 @@
     }
 
     $scope.minimal = {
+      passed: false,
       message: "",
       features: [],
       prediction: ""
     };
-    
+
     $scope.state = "";
 
     $scope.api = {
@@ -171,11 +172,11 @@
       }
 
       if ($scope.today.temp.day < 15) {
-        $scope.minimal.features.push("on se pèle");
+        $scope.minimal.features.push("il fait froid");
       }
 
       if ($scope.today.temp.day > 30) {
-        $scope.minimal.features.push("on est en plein cagnard");
+        $scope.minimal.features.push("il fait chaud");
       }
 
       if ($scope.today.humidity > 85) {
@@ -192,14 +193,14 @@
         if ($scope.minimal.features.length > 0) {
           $scope.minimal.features[0] = "Mais " + firstFeature;
         } else {
-          $scope.minimal.features[0] = "Sors les lunettes de soleil";
+          $scope.minimal.features[0] = "";
         }
       } else {
         $scope.minimal.message = "NON";
         if ($scope.minimal.features.length > 0) {
           $scope.minimal.features[0] = "En plus " + firstFeature;
         } else {
-          $scope.minimal.features[0] = "Je vais passer ma journée sur Netflix";
+          $scope.minimal.features[0] = "";
         }
       }
 
@@ -220,16 +221,21 @@
           break;
       }
 
-      // document.getElementsByTagName("video")[0].addEventListener("loadeddata", function(e) {
-        // $scope.page = "full";
+      if ($scope.minimal.passed) {
+        $scope.page = "full";
+      } else {
+        $scope.minimal.passed = true;
         $scope.page = "minimal";
-        $scope.loading = false;
-        // $scope.$apply();
-      // });
+      }
+
+      $scope.loading = false;
+
+      $scope.$broadcast("retrace", $scope.today.temp);
     };
 
     if (window.location.hash !== "") {
       $scope.city = window.location.hash.split("#")[1];
+      $scope.minimal.passed = true;
       $scope.go();
     }
   }]);

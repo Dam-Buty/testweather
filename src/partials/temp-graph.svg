@@ -1,6 +1,6 @@
 <svg class="graph" ng-if="!mobile">
   <g id="layer1">
-    <path class="strikeout" ng-attr-d="{{ path }}">
+    <path class="strikeout" ng-attr-d="{{ path }}" ng-if="!loading">
       <!--
       Hack pour dessiner progressivement le graphe. Prend en attribut la longueur du dasharray
       qui est le tableau contenant tous les "coups de pinceau" du SVG.

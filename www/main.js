@@ -271,11 +271,12 @@ e.$validators.maxlength=function(a,c){return 0>f||e.$isEmpty(c)||c.length<=f}}}}
     }
 
     $scope.minimal = {
+      passed: false,
       message: "",
       features: [],
       prediction: ""
     };
-    
+
     $scope.state = "";
 
     $scope.api = {
@@ -421,11 +422,11 @@ e.$validators.maxlength=function(a,c){return 0>f||e.$isEmpty(c)||c.length<=f}}}}
       }
 
       if ($scope.today.temp.day < 15) {
-        $scope.minimal.features.push("on se pèle");
+        $scope.minimal.features.push("il fait froid");
       }
 
       if ($scope.today.temp.day > 30) {
-        $scope.minimal.features.push("on est en plein cagnard");
+        $scope.minimal.features.push("il fait chaud");
       }
 
       if ($scope.today.humidity > 85) {
@@ -442,14 +443,14 @@ e.$validators.maxlength=function(a,c){return 0>f||e.$isEmpty(c)||c.length<=f}}}}
         if ($scope.minimal.features.length > 0) {
           $scope.minimal.features[0] = "Mais " + firstFeature;
         } else {
-          $scope.minimal.features[0] = "Sors les lunettes de soleil";
+          $scope.minimal.features[0] = "";
         }
       } else {
         $scope.minimal.message = "NON";
         if ($scope.minimal.features.length > 0) {
           $scope.minimal.features[0] = "En plus " + firstFeature;
         } else {
-          $scope.minimal.features[0] = "Je vais passer ma journée sur Netflix";
+          $scope.minimal.features[0] = "";
         }
       }
 
@@ -470,16 +471,21 @@ e.$validators.maxlength=function(a,c){return 0>f||e.$isEmpty(c)||c.length<=f}}}}
           break;
       }
 
-      // document.getElementsByTagName("video")[0].addEventListener("loadeddata", function(e) {
-        // $scope.page = "full";
+      if ($scope.minimal.passed) {
+        $scope.page = "full";
+      } else {
+        $scope.minimal.passed = true;
         $scope.page = "minimal";
-        $scope.loading = false;
-        // $scope.$apply();
-      // });
+      }
+
+      $scope.loading = false;
+
+      $scope.$broadcast("retrace", $scope.today.temp);
     };
 
     if (window.location.hash !== "") {
       $scope.city = window.location.hash.split("#")[1];
+      $scope.minimal.passed = true;
       $scope.go();
     }
   }]);
@@ -703,48 +709,59 @@ angular.module('weather')
         $scope.mobile = true;
       } else {
         $scope.mobile = false;
-        var temp = $scope.temp;
-        var ecart = temp.max - temp.min;
-
-        var width, height, margin, step, pointsWidth;
-
-        // Définit la grille selon la valeur de l'attribut mini
-        if ($scope.mini) {
-          width = 80;
-          height = 16;
-          margin = 3;
-        } else {
-          width = 600;
-          height = 50;
-          margin = 5;
-        }
-
-        step = Math.floor(width / 3); // distance horizontale entre les points du graphe
-        max = height - margin;
-        amplitude = max - margin;
-
-        // On calcule les coordonées des 4 points du graphe
+        $scope.points = [];
         $scope.pointsWidth = 3;
+        $scope.path = "";
 
-        $scope.points = [
-          [step * 0 + margin , (max - Math.floor((temp.morn - temp.min) / ecart * amplitude))],
-          [step * 1 , (max - Math.floor((temp.day - temp.min) / ecart * amplitude))],
-          [step * 2 , (max - Math.floor((temp.eve - temp.min) / ecart * amplitude))],
-          [step * 3 - margin , (max - Math.floor((temp.night - temp.min) / ecart * amplitude))]
-        ];
+        $scope.trace = function(temp) {
+          var ecart = temp.max - temp.min;
 
-        // Ici on construit le path pour l'élément SVG qui dessine le graphe
+          var width, height, margin, step, pointsWidth;
 
-        var pathPoints = $scope.points.slice();
-        var depart = pathPoints.shift(); // On récupère le point de départ
+          // Définit la grille selon la valeur de l'attribut mini
+          if ($scope.mini) {
+            width = 80;
+            height = 16;
+            margin = 3;
+          } else {
+            width = 600;
+            height = 50;
+            margin = 5;
+          }
 
-        // La commande M bouge le curseur aux coordonées de départ
-        // La commande C crée une courbe passant par le reste des points
-        $scope.path = "M " + depart.join(",") + " C";
+          step = Math.floor(width / 3); // distance horizontale entre les points du graphe
+          max = height - margin;
+          amplitude = max - margin;
 
-        for (var i = 0;i < pathPoints.length;i++) {
-          $scope.path += " " + pathPoints[i].join(",");
-        }
+          // On calcule les coordonées des 4 points du graphe
+          $scope.pointsWidth = 3;
+
+          $scope.points = [
+            [step * 0 + margin , (max - Math.floor((temp.morn - temp.min) / ecart * amplitude))],
+            [step * 1 , (max - Math.floor((temp.day - temp.min) / ecart * amplitude))],
+            [step * 2 , (max - Math.floor((temp.eve - temp.min) / ecart * amplitude))],
+            [step * 3 - margin , (max - Math.floor((temp.night - temp.min) / ecart * amplitude))]
+          ];
+
+          // Ici on construit le path pour l'élément SVG qui dessine le graphe
+
+          var pathPoints = $scope.points.slice();
+          var depart = pathPoints.shift(); // On récupère le point de départ
+
+          // La commande M bouge le curseur aux coordonées de départ
+          // La commande C crée une courbe passant par le reste des points
+          $scope.path = "M " + depart.join(",") + " C";
+
+          for (var i = 0;i < pathPoints.length;i++) {
+            $scope.path += " " + pathPoints[i].join(",");
+          }
+        };
+
+        $scope.$on("retrace", function(e, temp) {
+          $scope.trace(temp);
+        });
+
+        $scope.trace($scope.temp);
       }
     }]
   };
