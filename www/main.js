@@ -252,8 +252,8 @@ e.$validators.maxlength=function(a,c){return 0>f||e.$isEmpty(c)||c.length<=f}}}}
 
   angular.module("weather", [])
   .controller("WeatherController",
-  [ "$window", "$scope", "$http", "$timeout",
-  function($window, $scope, $http, $timeout) {
+  [ "$window", "$scope", "$http", "$timeout", "$q",
+  function($window, $scope, $http, $timeout, $q) {
     $scope.loading = false;
     $scope.page = "form";
 
@@ -261,7 +261,15 @@ e.$validators.maxlength=function(a,c){return 0>f||e.$isEmpty(c)||c.length<=f}}}}
     $scope.lat = undefined;
     $scope.lon = undefined;
 
-    $scope.today = undefined;
+    $scope.current = {
+      temp: undefined,
+      wind: undefined,
+      descr: undefined,
+      state: undefined,
+      day: undefined,
+      hourlies: []
+    };
+
     $scope.forecast = [];
 
     $scope.mobile = false;
@@ -270,30 +278,37 @@ e.$validators.maxlength=function(a,c){return 0>f||e.$isEmpty(c)||c.length<=f}}}}
       $scope.mobile = true;
     }
 
-    $scope.minimal = {
-      passed: false,
-      message: "",
-      features: [],
-      prediction: ""
-    };
-
-    $scope.state = "";
-
     $scope.api = {
-      mock: false,
-      baseUrl: "http://api.openweathermap.org/data/2.5/forecast/daily",
-      mockUrl: "test/data.dev.json",
+      mock: false, // Mettre à true pour tester avec les données en local
 
-      data: undefined,
+      data: {
+        current: undefined,
+        hourly: undefined,
+        daily: undefined
+      },
 
       params: {
         lang: "fr",
-        cnt: 6,
         mode: "json",
         units: "metric",
         q: "",
         lat: "",
         lon: ""
+      },
+
+      url: {
+        current: {
+          base: "http://api.openweathermap.org/data/2.5/weather",
+          mock: "test/current.dev.json"
+        },
+        hourly: {
+          base: "http://api.openweathermap.org/data/2.5/forecast",
+          mock: "test/forecast.min.json"
+        },
+        daily: {
+          base: "http://api.openweathermap.org/data/2.5/forecast/daily",
+          mock: "test/daily.min.json"
+        }
       },
 
       // Si on laisse lat et lon à vide, et que la ville n'est pas trouvée,
@@ -315,23 +330,40 @@ e.$validators.maxlength=function(a,c){return 0>f||e.$isEmpty(c)||c.length<=f}}}}
       },
 
       call: function() {
-        var url;
+        var current, hourly, daily;
         var self = this;
 
         if (this.mock) {
-          url = this.mockUrl;
+          current = this.url.current.mock;
+          hourly = this.url.hourly.mock;
+          daily = this.url.daily.mock;
         } else {
-          url = this.baseUrl;
+          current = this.url.current.base;
+          hourly = this.url.hourly.base;
+          daily = this.url.daily.base;
         }
 
         if (this.params.lat === "" && this.params.lon === "") {
           this.params.q = $scope.city;
         }
 
-        return $http.get(url, {
-          params: this.getParams()
-        }).success(function(data) {
-          self.data = data;
+        return $q.all([
+          $http.get(current, {
+            params: this.getParams()
+          }).success(function(data) {
+            self.data.current = data;
+          }),
+          $http.get(hourly, {
+            params: this.getParams()
+          }).success(function(data) {
+            self.data.hourly = data;
+          }),
+          $http.get(daily, {
+            params: this.getParams()
+          }).success(function(data) {
+            self.data.daily = data;
+          })
+        ]).then(function() {
           self.params.q = "";
           self.params.lat = "";
           self.params.lon = "";
@@ -342,7 +374,7 @@ e.$validators.maxlength=function(a,c){return 0>f||e.$isEmpty(c)||c.length<=f}}}}
     $scope.go = function() {
       $scope.loading = true;
       $scope.api.call()
-      .success(function(data) {
+      .then(function() {
         $scope.process();
       });
     };
@@ -390,14 +422,46 @@ e.$validators.maxlength=function(a,c){return 0>f||e.$isEmpty(c)||c.length<=f}}}}
         "samedi"
       ];
 
-      $scope.city = $scope.api.data.city.name + "," + $scope.api.data.city.country;
-      $scope.minimal.features = [];
+      $scope.city = $scope.api.data.daily.city.name + "," + $scope.api.data.daily.city.country;
 
       window.location.hash = $scope.city;
 
+      // On récupère la date
+      var today = new Date();
+
+
+      $scope.current.day = {
+        human: ("00" + today.getDate()).slice(-2) + "/" +
+              ("00" + (today.getMonth() + 1)).slice(-2) + "/" +
+              today.getFullYear(),
+        jour: dayNames[today.getDay()]
+      };
+
+      // On récupère le temps actuel dans le flux "current"
+      $scope.current.temp = $scope.api.data.current.main.temp;
+      $scope.current.wind = $scope.api.data.current.wind;
+      $scope.current.descr = $scope.api.data.current.weather[0].description;
+
+      // On simplifie l'état
+      switch($scope.api.data.current.weather[0].main) {
+        case "Snow":
+          $scope.current.state = "snow";
+          break;
+        case "Rain":
+          $scope.current.state = "rain";
+          break;
+        default:
+          $scope.current.state = "clear";
+          break;
+      }
+
+      $scope.current.hourlies = $scope.api.data.hourly.list.slice(0, 4);
+
+      $scope.forecast = $scope.api.data.daily.list.slice(1, 6);
+
       // Formatage des dates
-      for(var i = 0;i < days.length;i++) {
-        var day = days[i];
+      for(var i = 0;i < $scope.forecast.length;i++) {
+        var day = $scope.forecast[i];
 
         day["dtObject"] = new Date(day.dt * 1000);
         day["dtHuman"] = ("00" + day.dtObject.getDate()).slice(-2) + "/" +
@@ -406,86 +470,15 @@ e.$validators.maxlength=function(a,c){return 0>f||e.$isEmpty(c)||c.length<=f}}}}
         day["dtJour"] = dayNames[day.dtObject.getDay()];
       }
 
-      // on duplique l'array avec slice pour garder l'original intact dans $scope.api
-      days = $scope.api.data.list.slice();
-
-      $scope.today = days.shift(); // On met le premier jour dans today
-      $scope.forecast = days;      // et le reste dans forecast
-
-      // On extrait les caractéristiques du temps d'aujourd'hui
-      if ($scope.today.rain !== undefined) {
-        $scope.minimal.features.push("il pleut");
-      }
-
-      if ($scope.today.snow !== undefined) {
-        $scope.minimal.features.push("il neige");
-      }
-
-      if ($scope.today.temp.day < 15) {
-        $scope.minimal.features.push("il fait froid");
-      }
-
-      if ($scope.today.temp.day > 30) {
-        $scope.minimal.features.push("il fait chaud");
-      }
-
-      if ($scope.today.humidity > 85) {
-        $scope.minimal.features.push("il fait humide");
-      }
-
-      // On naturalise un peu le langage
-      var firstFeature = $scope.minimal.features[0];
-      var lastFeature = $scope.minimal.features[$scope.minimal.features.length - 1];
-
-      // Finalement, est-ce qu'il fait beau ou pas?
-      if ($scope.today.weather[0].id >= 800) {
-        $scope.minimal.message = "OUI";
-        if ($scope.minimal.features.length > 0) {
-          $scope.minimal.features[0] = "Mais " + firstFeature;
-        } else {
-          $scope.minimal.features[0] = "";
-        }
-      } else {
-        $scope.minimal.message = "NON";
-        if ($scope.minimal.features.length > 0) {
-          $scope.minimal.features[0] = "En plus " + firstFeature;
-        } else {
-          $scope.minimal.features[0] = "";
-        }
-      }
-
-      if ($scope.minimal.features.length > 1) {
-        $scope.minimal.features[$scope.minimal.features.length - 1] = "et " + lastFeature + ".";
-      }
-
-      // On choisit le background pour le mode photo-bg
-      switch($scope.today.weather[0].main) {
-        case "Snow":
-          $scope.state = "snow";
-          break;
-        case "Rain":
-          $scope.state = "rain";
-          break;
-        default:
-          $scope.state = "clear";
-          break;
-      }
-
-      if ($scope.minimal.passed) {
-        $scope.page = "full";
-      } else {
-        $scope.minimal.passed = true;
-        $scope.page = "minimal";
-      }
+      $scope.page = "full";
 
       $scope.loading = false;
 
-      $scope.$broadcast("retrace", $scope.today.temp);
+      // $scope.$broadcast("retrace", $scope.today.temp);
     };
 
     if (window.location.hash !== "") {
       $scope.city = window.location.hash.split("#")[1];
-      $scope.minimal.passed = true;
       $scope.go();
     }
   }]);
@@ -521,7 +514,7 @@ Dépend de
 - background
 - wind-widget
 - search-widget
-- temp-widget
+- current-card
 - forecast-widget
 ---------------------------------*/
 
@@ -538,52 +531,76 @@ angular.module('weather')
 (function () {
 
 /*---------------------------------
-Result minimal v1.0
-Affiche le résultat minimalistiquement
-
-Dépend de
--
+Augmented graph v1.0
+Affiche un graphe des différentes températures de la journée qui gère le hover
 ---------------------------------*/
 
 angular.module('weather')
-.directive('resultMinimal', ["$timeout", function($timeout) {
+.directive('augmentedGraph', function() {
   return {
     restrict: 'E',
-    templateUrl: 'pages/result-minimal.html',
+    type: 'svg',
     scope: {
-      minimal: '=',
-      city: '='
+      hourlies: '=',
     },
+    templateNamespace: "svg",
+    templateUrl: 'partials/augmented-graph.svg',
     controller: ["$scope", function($scope) {
-      $scope.currentFeature = "";
-      $scope.currentIndex = 0;
-      $scope.delay = 1500;
-      $scope.last = false;
-      $scope.first = true;
+      $scope.dash = 604;
+      $scope.points = [];
+      $scope.pointsWidth = 3;
+      $scope.path = "";
 
-      $scope.tick = function() {
-        $timeout(function() {
-          if ($scope.currentIndex < $scope.minimal.features.length) {
-            $scope.currentFeature = $scope.minimal.features[$scope.currentIndex];
-            $scope.currentIndex++;
+      $scope.trace = function() {
+        var min = 0, max = 0;
 
-            if ($scope.currentIndex == $scope.minimal.features.length) {
-              $scope.last = true;
-            }
+        for(var i = 0;i < $scope.hourlies.length;i++){
+          min = Math.min(min, $scope.hourlies[i].main.temp);
+          max = Math.max(max, $scope.hourlies[i].main.temp);
+        }
 
-            $scope.first = false;
+        var ecart = max - min;
 
-            $scope.tick();
-          } else {
-            $scope.$parent.$parent.page = "full";
-          }
-        }, $scope.delay);
+        var width, height, margin, step, pointsWidth;
+
+        // Définit la grille
+        width = 600;
+        height = 50;
+        margin = 5;
+
+        step = Math.floor(width / 3); // distance horizontale entre les points du graphe
+        max = height - margin;
+        amplitude = max - margin;
+
+        // On calcule les coordonées des 4 points du graphe
+        $scope.points = [
+          [step * 0 + margin , (max - Math.floor(($scope.hourlies[0].main.temp - min) / ecart * amplitude))],
+          [step * 1 , (max - Math.floor(($scope.hourlies[1].main.temp - min) / ecart * amplitude))],
+          [step * 2 , (max - Math.floor(($scope.hourlies[2].main.temp - min) / ecart * amplitude))],
+          [step * 3 - margin , (max - Math.floor(($scope.hourlies[3].main.temp - min) / ecart * amplitude))]
+        ];
+
+        // Ici on construit le path pour l'élément SVG qui dessine le graphe
+        var pathPoints = $scope.points.slice();
+        var depart = pathPoints.shift(); // On récupère le point de départ
+
+        // La commande M bouge le curseur aux coordonées de départ
+        // La commande C crée une courbe passant par le reste des points
+        $scope.path = "M " + depart.join(",");
+
+        for (i = 0;i < pathPoints.length;i++) {
+          $scope.path += " L " + pathPoints[i].join(",");
+        }
       };
 
-      $scope.tick();
+      $scope.$on("retrace", function(e, temp) {
+        $scope.trace();
+      });
+
+      $scope.trace();
     }]
   };
-}]);
+});
 
 })();
 
@@ -615,6 +632,23 @@ angular.module('weather')
         $scope.mode = mode;
       };
     }]
+  };
+});
+
+})();
+
+(function () {
+
+/*---------------------------------
+Current card v1.0
+La carte centrale qui affiche le temps qu'il fait
+---------------------------------*/
+
+angular.module('weather')
+.directive('currentCard', function() {
+  return {
+    restrict: 'E',
+    templateUrl: 'partials/current-card.html'
   };
 });
 
@@ -689,7 +723,6 @@ Attributs
   @ eve
   @ night
 @ mini : si true, affiche la version réduite du graphe, sinon la version complète
-@ dash : la taille du dasharray du graphe. (cf temp-graph.svg)
 ---------------------------------*/
 
 angular.module('weather')
@@ -700,70 +733,69 @@ angular.module('weather')
     templateNamespace: "svg",
     scope: {
       temp: '=',
-      mini: "=",
-      dash: "="
+      mini: "="
     },
     templateUrl: 'partials/temp-graph.svg',
     controller: ["$scope", function($scope) {
-      if (screen.width <= 1024) {
-        $scope.mobile = true;
-      } else {
-        $scope.mobile = false;
-        $scope.points = [];
+      $scope.mobile = false;
+      $scope.points = [];
+      $scope.pointsWidth = 3;
+      $scope.path = "";
+
+      $scope.trace = function(temp) {
+        var ecart = temp.max - temp.min;
+
+        var width, height, margin, step, pointsWidth;
+
+        // Définit la grille selon la valeur de l'attribut mini
+        if ($scope.mini) {
+          width = 80;
+          height = 16;
+          margin = 3;
+        } else {
+          width = 600;
+          height = 50;
+          margin = 5;
+        }
+
+        step = Math.floor(width / 3); // distance horizontale entre les points du graphe
+        max = height - margin;
+        amplitude = max - margin;
+
+        // On calcule les coordonées des 4 points du graphe
         $scope.pointsWidth = 3;
-        $scope.path = "";
 
-        $scope.trace = function(temp) {
-          var ecart = temp.max - temp.min;
+        $scope.points = [
+          [step * 0 + margin , (max - Math.floor((temp.morn - temp.min) / ecart * amplitude))],
+          [step * 1 , (max - Math.floor((temp.day - temp.min) / ecart * amplitude))],
+          [step * 2 , (max - Math.floor((temp.eve - temp.min) / ecart * amplitude))],
+          [step * 3 - margin , (max - Math.floor((temp.night - temp.min) / ecart * amplitude))]
+        ];
 
-          var width, height, margin, step, pointsWidth;
+        // Ici on construit le path pour l'élément SVG qui dessine le graphe
 
-          // Définit la grille selon la valeur de l'attribut mini
-          if ($scope.mini) {
-            width = 80;
-            height = 16;
-            margin = 3;
-          } else {
-            width = 600;
-            height = 50;
-            margin = 5;
-          }
+        var pathPoints = $scope.points.slice();
+        var depart = pathPoints.shift(); // On récupère le point de départ
 
-          step = Math.floor(width / 3); // distance horizontale entre les points du graphe
-          max = height - margin;
-          amplitude = max - margin;
+        // La commande M bouge le curseur aux coordonées de départ
+        // La commande C crée une courbe passant par le reste des points
+        $scope.path = "M " + depart.join(",") + " C";
 
-          // On calcule les coordonées des 4 points du graphe
-          $scope.pointsWidth = 3;
+        for (var i = 0;i < pathPoints.length;i++) {
+          $scope.path += " " + pathPoints[i].join(",");
+        }
+      };
 
-          $scope.points = [
-            [step * 0 + margin , (max - Math.floor((temp.morn - temp.min) / ecart * amplitude))],
-            [step * 1 , (max - Math.floor((temp.day - temp.min) / ecart * amplitude))],
-            [step * 2 , (max - Math.floor((temp.eve - temp.min) / ecart * amplitude))],
-            [step * 3 - margin , (max - Math.floor((temp.night - temp.min) / ecart * amplitude))]
-          ];
+      $scope.$on("retrace", function(e, temp) {
+        $scope.trace(temp);
+      });
 
-          // Ici on construit le path pour l'élément SVG qui dessine le graphe
-
-          var pathPoints = $scope.points.slice();
-          var depart = pathPoints.shift(); // On récupère le point de départ
-
-          // La commande M bouge le curseur aux coordonées de départ
-          // La commande C crée une courbe passant par le reste des points
-          $scope.path = "M " + depart.join(",") + " C";
-
-          for (var i = 0;i < pathPoints.length;i++) {
-            $scope.path += " " + pathPoints[i].join(",");
-          }
-        };
-
-        $scope.$on("retrace", function(e, temp) {
-          $scope.trace(temp);
-        });
-
-        $scope.trace($scope.temp);
-      }
-    }]
+      $scope.trace($scope.temp);
+    }],
+    link: function($scope, el, attr) {
+      document.getElementById("test-path").setAttribute("d", $scope.path);
+      $scope.dash = Math.ceil(document.getElementById("test-path").getTotalLength());
+    }
   };
 });
 
@@ -788,7 +820,6 @@ Attributs
   @ night
 @ descr : description des conditions météo ("Ensoleillé", "Nuageux"...)
 @ mini : si true, affiche la version réduite du graphe, sinon la version complète
-@ dash : la taille du dasharray du graphe (cf temp-graph.svg)
 ---------------------------------*/
 
 angular.module('weather').directive('tempWidget', function() {
@@ -797,8 +828,7 @@ angular.module('weather').directive('tempWidget', function() {
     scope: {
       temp: '=',
       descr: "=",
-      mini: "=",
-      dash: "="
+      mini: "="
     },
     templateUrl: 'partials/temp-widget.html'
   };

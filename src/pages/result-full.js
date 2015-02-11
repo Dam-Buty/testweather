@@ -8,7 +8,7 @@ Dépend de
 - background
 - wind-widget
 - search-widget
-- temp-widget
+- current-card
 - forecast-widget
 ---------------------------------*/
 

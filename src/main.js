@@ -2,8 +2,8 @@
 
   angular.module("weather", [])
   .controller("WeatherController",
-  [ "$window", "$scope", "$http", "$timeout",
-  function($window, $scope, $http, $timeout) {
+  [ "$window", "$scope", "$http", "$timeout", "$q",
+  function($window, $scope, $http, $timeout, $q) {
     $scope.loading = false;
     $scope.page = "form";
 
@@ -11,7 +11,15 @@
     $scope.lat = undefined;
     $scope.lon = undefined;
 
-    $scope.today = undefined;
+    $scope.current = {
+      temp: undefined,
+      wind: undefined,
+      descr: undefined,
+      state: undefined,
+      day: undefined,
+      hourlies: []
+    };
+
     $scope.forecast = [];
 
     $scope.mobile = false;
@@ -20,30 +28,37 @@
       $scope.mobile = true;
     }
 
-    $scope.minimal = {
-      passed: false,
-      message: "",
-      features: [],
-      prediction: ""
-    };
-
-    $scope.state = "";
-
     $scope.api = {
-      mock: false,
-      baseUrl: "http://api.openweathermap.org/data/2.5/forecast/daily",
-      mockUrl: "test/data.dev.json",
+      mock: false, // Mettre à true pour tester avec les données en local
 
-      data: undefined,
+      data: {
+        current: undefined,
+        hourly: undefined,
+        daily: undefined
+      },
 
       params: {
         lang: "fr",
-        cnt: 6,
         mode: "json",
         units: "metric",
         q: "",
         lat: "",
         lon: ""
+      },
+
+      url: {
+        current: {
+          base: "http://api.openweathermap.org/data/2.5/weather",
+          mock: "test/current.dev.json"
+        },
+        hourly: {
+          base: "http://api.openweathermap.org/data/2.5/forecast",
+          mock: "test/forecast.min.json"
+        },
+        daily: {
+          base: "http://api.openweathermap.org/data/2.5/forecast/daily",
+          mock: "test/daily.min.json"
+        }
       },
 
       // Si on laisse lat et lon à vide, et que la ville n'est pas trouvée,
@@ -65,23 +80,40 @@
       },
 
       call: function() {
-        var url;
+        var current, hourly, daily;
         var self = this;
 
         if (this.mock) {
-          url = this.mockUrl;
+          current = this.url.current.mock;
+          hourly = this.url.hourly.mock;
+          daily = this.url.daily.mock;
         } else {
-          url = this.baseUrl;
+          current = this.url.current.base;
+          hourly = this.url.hourly.base;
+          daily = this.url.daily.base;
         }
 
         if (this.params.lat === "" && this.params.lon === "") {
           this.params.q = $scope.city;
         }
 
-        return $http.get(url, {
-          params: this.getParams()
-        }).success(function(data) {
-          self.data = data;
+        return $q.all([
+          $http.get(current, {
+            params: this.getParams()
+          }).success(function(data) {
+            self.data.current = data;
+          }),
+          $http.get(hourly, {
+            params: this.getParams()
+          }).success(function(data) {
+            self.data.hourly = data;
+          }),
+          $http.get(daily, {
+            params: this.getParams()
+          }).success(function(data) {
+            self.data.daily = data;
+          })
+        ]).then(function() {
           self.params.q = "";
           self.params.lat = "";
           self.params.lon = "";
@@ -92,7 +124,7 @@
     $scope.go = function() {
       $scope.loading = true;
       $scope.api.call()
-      .success(function(data) {
+      .then(function() {
         $scope.process();
       });
     };
@@ -140,14 +172,46 @@
         "samedi"
       ];
 
-      $scope.city = $scope.api.data.city.name + "," + $scope.api.data.city.country;
-      $scope.minimal.features = [];
+      $scope.city = $scope.api.data.daily.city.name + "," + $scope.api.data.daily.city.country;
 
       window.location.hash = $scope.city;
 
+      // On récupère la date
+      var today = new Date();
+
+
+      $scope.current.day = {
+        human: ("00" + today.getDate()).slice(-2) + "/" +
+              ("00" + (today.getMonth() + 1)).slice(-2) + "/" +
+              today.getFullYear(),
+        jour: dayNames[today.getDay()]
+      };
+
+      // On récupère le temps actuel dans le flux "current"
+      $scope.current.temp = $scope.api.data.current.main.temp;
+      $scope.current.wind = $scope.api.data.current.wind;
+      $scope.current.descr = $scope.api.data.current.weather[0].description;
+
+      // On simplifie l'état
+      switch($scope.api.data.current.weather[0].main) {
+        case "Snow":
+          $scope.current.state = "snow";
+          break;
+        case "Rain":
+          $scope.current.state = "rain";
+          break;
+        default:
+          $scope.current.state = "clear";
+          break;
+      }
+
+      $scope.current.hourlies = $scope.api.data.hourly.list.slice(0, 4);
+
+      $scope.forecast = $scope.api.data.daily.list.slice(1, 6);
+
       // Formatage des dates
-      for(var i = 0;i < days.length;i++) {
-        var day = days[i];
+      for(var i = 0;i < $scope.forecast.length;i++) {
+        var day = $scope.forecast[i];
 
         day["dtObject"] = new Date(day.dt * 1000);
         day["dtHuman"] = ("00" + day.dtObject.getDate()).slice(-2) + "/" +
@@ -156,86 +220,15 @@
         day["dtJour"] = dayNames[day.dtObject.getDay()];
       }
 
-      // on duplique l'array avec slice pour garder l'original intact dans $scope.api
-      days = $scope.api.data.list.slice();
-
-      $scope.today = days.shift(); // On met le premier jour dans today
-      $scope.forecast = days;      // et le reste dans forecast
-
-      // On extrait les caractéristiques du temps d'aujourd'hui
-      if ($scope.today.rain !== undefined) {
-        $scope.minimal.features.push("il pleut");
-      }
-
-      if ($scope.today.snow !== undefined) {
-        $scope.minimal.features.push("il neige");
-      }
-
-      if ($scope.today.temp.day < 15) {
-        $scope.minimal.features.push("il fait froid");
-      }
-
-      if ($scope.today.temp.day > 30) {
-        $scope.minimal.features.push("il fait chaud");
-      }
-
-      if ($scope.today.humidity > 85) {
-        $scope.minimal.features.push("il fait humide");
-      }
-
-      // On naturalise un peu le langage
-      var firstFeature = $scope.minimal.features[0];
-      var lastFeature = $scope.minimal.features[$scope.minimal.features.length - 1];
-
-      // Finalement, est-ce qu'il fait beau ou pas?
-      if ($scope.today.weather[0].id >= 800) {
-        $scope.minimal.message = "OUI";
-        if ($scope.minimal.features.length > 0) {
-          $scope.minimal.features[0] = "Mais " + firstFeature;
-        } else {
-          $scope.minimal.features[0] = "";
-        }
-      } else {
-        $scope.minimal.message = "NON";
-        if ($scope.minimal.features.length > 0) {
-          $scope.minimal.features[0] = "En plus " + firstFeature;
-        } else {
-          $scope.minimal.features[0] = "";
-        }
-      }
-
-      if ($scope.minimal.features.length > 1) {
-        $scope.minimal.features[$scope.minimal.features.length - 1] = "et " + lastFeature + ".";
-      }
-
-      // On choisit le background pour le mode photo-bg
-      switch($scope.today.weather[0].main) {
-        case "Snow":
-          $scope.state = "snow";
-          break;
-        case "Rain":
-          $scope.state = "rain";
-          break;
-        default:
-          $scope.state = "clear";
-          break;
-      }
-
-      if ($scope.minimal.passed) {
-        $scope.page = "full";
-      } else {
-        $scope.minimal.passed = true;
-        $scope.page = "minimal";
-      }
+      $scope.page = "full";
 
       $scope.loading = false;
 
-      $scope.$broadcast("retrace", $scope.today.temp);
+      // $scope.$broadcast("retrace", $scope.today.temp);
     };
 
     if (window.location.hash !== "") {
       $scope.city = window.location.hash.split("#")[1];
-      $scope.minimal.passed = true;
       $scope.go();
     }
   }]);

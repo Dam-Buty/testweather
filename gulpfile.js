@@ -65,6 +65,7 @@ gulp.task('scripts', function() {
 // Preprocess Sass, concat all, autoprefix and minify
 gulp.task('styles', function () {
     gulp.src(src + '**/*.scss')
+        .pipe(debug())  
         .pipe(sass())
         .pipe(concat('main.css'))
         .pipe(autoprefix('last 2 versions'))

@@ -9,6 +9,10 @@
 </head>
 <body ng-controller="WeatherController" ng-view>
   <front-form></front-form>
-  <result-minimal ng-if="page == 'minimal'" minimal="minimal" city="city"></result-minimal>
   <result-full></result-full>
+  <svg id="test-graph" class="graph">
+    <g>
+      <path id="test-path" class="strikeout">
+    </g>
+  </svg>
 </body>

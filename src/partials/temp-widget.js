@@ -17,7 +17,6 @@ Attributs
   @ night
 @ descr : description des conditions météo ("Ensoleillé", "Nuageux"...)
 @ mini : si true, affiche la version réduite du graphe, sinon la version complète
-@ dash : la taille du dasharray du graphe (cf temp-graph.svg)
 ---------------------------------*/
 
 angular.module('weather').directive('tempWidget', function() {
@@ -26,8 +25,7 @@ angular.module('weather').directive('tempWidget', function() {
     scope: {
       temp: '=',
       descr: "=",
-      mini: "=",
-      dash: "="
+      mini: "="
     },
     templateUrl: 'partials/temp-widget.html'
   };

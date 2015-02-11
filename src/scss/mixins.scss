@@ -5,15 +5,11 @@
   transform: translate(-50%,-50%);
 }
 
-@mixin custom-temp($width, $height, $dash) {
+@mixin custom-temp($width, $height) {
   .temp {
     .graph {
       width: $width !important;
       height: $height !important;
-
-      .strikeout {
-        stroke-dasharray:$dash,$dash;
-      }
     }
   }
 }

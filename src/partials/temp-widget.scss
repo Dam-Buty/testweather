@@ -2,16 +2,6 @@
 @import '../scss/mixins.scss';
 
 .temp {
-  .graph {
-    text-align: center;
-
-    .strikeout {
-      fill:none;
-      stroke:black;
-      stroke-width:2px;
-      stroke-linecap:round;
-    }
-  }
 
   .borne {
     padding: 0.5em;

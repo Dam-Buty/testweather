@@ -1,0 +1,9 @@
+<svg class="augmented-graph" ng-if="!mobile">
+  <g id="layer1">
+    <path class="strikeout" ng-attr-d="{{ path }}" ng-if="!loading">
+      <animate attributeName="stroke-dashoffset" ng-attr-from="{{ dash }}" to="0" dur="1s" begin="rect.click;0s"/>
+    </path>
+  </g>
+  <circle ng-repeat="point in points" ng-attr-cx="{{point[0]}}" ng-attr-cy="{{point[1]}}" r="3" stroke="black" stroke-width="1" fill="none" />
+  <circle ng-repeat="point in points" ng-attr-cx="{{point[0]}}" ng-attr-cy="{{point[1]}}" r="8" stroke="black" stroke-width="2" fill="none" />
+</svg>

@@ -29,14 +29,17 @@
 
   header {
     text-align: left;
+    line-height: 50px;
 
     img {
       float: right;
+      width: 50px;
+      height: 50px;
     }
   }
 
   .container-temp {
     position: relative;
-    @include custom-temp(80px, 16px, 88);
+    @include custom-temp(80px, 16px);
   }
 }
