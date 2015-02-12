@@ -1,5 +1,5 @@
 <section id="full" ng-show="page == 'full'" ng-if="!loading">
-  <background state="state"></background>
+  <background state="current.state"></background>
   <header>{{ current.day.jour }} {{ current.day.human }} à <search-widget></search-widget></header>
   <wind-widget deg="current.wind.deg" speed="current.wind.speed"></wind-widget>
   <current-card></current-card>

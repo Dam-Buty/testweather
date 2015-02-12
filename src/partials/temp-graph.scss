@@ -2,12 +2,18 @@
 @import '../scss/mixins.scss';
 
 .graph {
-  text-align: center;
-
   .strikeout {
     fill:none;
     stroke:black;
     stroke-width:2px;
     stroke-linecap:round;
+  }
+
+  circle {
+    pointer-events: bounding-box;
+
+    &:hover {
+      stroke: blue;
+    }
   }
 }

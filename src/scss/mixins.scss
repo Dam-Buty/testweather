@@ -4,12 +4,3 @@
   left: 50%;
   transform: translate(-50%,-50%);
 }
-
-@mixin custom-temp($width, $height) {
-  .temp {
-    .graph {
-      width: $width !important;
-      height: $height !important;
-    }
-  }
-}

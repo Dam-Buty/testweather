@@ -6,14 +6,9 @@ Affiche un graphe des différentes températures de la journée
 Ne s'affiche pas sur mobile
 
 Attributs
-@ temp : un objet contenant les températures en degrés
-  @ min
-  @ max
-  @ morn
-  @ day
-  @ eve
-  @ night
+@ points : un tableau contenant 4 températures en degrés
 @ mini : si true, affiche la version réduite du graphe, sinon la version complète
+@ interactive : si true, affiche la version centrale du graphe, avec les points qui réagissent au hover
 ---------------------------------*/
 
 angular.module('weather')
@@ -23,22 +18,28 @@ angular.module('weather')
     type: 'svg',
     templateNamespace: "svg",
     scope: {
-      temp: '=',
-      mini: "="
+      temps: '=',
+      mini: "=",
+      interactive: "="
     },
     templateUrl: 'partials/temp-graph.svg',
     controller: function($scope) {
-      $scope.mobile = false;
       $scope.points = [];
-      $scope.pointsWidth = 3;
       $scope.path = "";
 
-      $scope.trace = function(temp) {
-        var ecart = temp.max - temp.min;
+      $scope.trace = function() {
+        var min = 0, max = 0;
+
+        for(var i = 0;i < $scope.temps.length;i++){
+          min = Math.min(min, $scope.temps[i]);
+          max = Math.max(max, $scope.temps[i]);
+        }
+
+        var ecart = max - min;
 
         var width, height, margin, step, pointsWidth;
 
-        // Définit la grille selon la valeur de l'attribut mini
+        // Définit la grille
         if ($scope.mini) {
           width = 80;
           height = 16;
@@ -54,34 +55,48 @@ angular.module('weather')
         amplitude = max - margin;
 
         // On calcule les coordonées des 4 points du graphe
-        $scope.pointsWidth = 3;
-
         $scope.points = [
-          [step * 0 + margin , (max - Math.floor((temp.morn - temp.min) / ecart * amplitude))],
-          [step * 1 , (max - Math.floor((temp.day - temp.min) / ecart * amplitude))],
-          [step * 2 , (max - Math.floor((temp.eve - temp.min) / ecart * amplitude))],
-          [step * 3 - margin , (max - Math.floor((temp.night - temp.min) / ecart * amplitude))]
+          [step * 0 + margin , (max - Math.floor(($scope.temps[0] - min) / ecart * amplitude))],
+          [step * 1 , (max - Math.floor(($scope.temps[1] - min) / ecart * amplitude))],
+          [step * 2 , (max - Math.floor(($scope.temps[2] - min) / ecart * amplitude))],
+          [step * 3 - margin , (max - Math.floor(($scope.temps[3] - min) / ecart * amplitude))]
         ];
 
         // Ici on construit le path pour l'élément SVG qui dessine le graphe
-
         var pathPoints = $scope.points.slice();
         var depart = pathPoints.shift(); // On récupère le point de départ
 
         // La commande M bouge le curseur aux coordonées de départ
         // La commande C crée une courbe passant par le reste des points
-        $scope.path = "M " + depart.join(",") + " C";
+        var suffix, prefix;
 
-        for (var i = 0;i < pathPoints.length;i++) {
-          $scope.path += " " + pathPoints[i].join(",");
+        if ($scope.interactif) {
+          suffix = "";
+          prefix = "L";
+        } else {
+          suffix = "C";
+          prefix = "";
+        }
+
+        $scope.path = "M" + depart.join(",") + " " + suffix;
+
+        for (i = 0;i < pathPoints.length;i++) {
+          $scope.path += " " + prefix + pathPoints[i].join(",");
         }
       };
 
-      $scope.$on("retrace", function(e, temp) {
-        $scope.trace(temp);
-      });
+      // $scope.$on("retrace", function(e, temp) {
+      //   $scope.trace(temp);
+      // });
+      $scope.mouseover = function(idx) {
+        $scope.$emit("graph.hover", idx);
+      };
 
-      $scope.trace($scope.temp);
+      $scope.mouseleave = function() {
+        $scope.$emit("graph.hover", undefined);
+      };
+
+      $scope.trace();
     },
     link: function($scope, el, attr) {
       document.getElementById("test-path").setAttribute("d", $scope.path);

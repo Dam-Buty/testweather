@@ -267,7 +267,38 @@ e.$validators.maxlength=function(a,c){return 0>f||e.$isEmpty(c)||c.length<=f}}}}
       descr: undefined,
       state: undefined,
       day: undefined,
-      hourlies: []
+      hourlies: [],
+      temps: []
+    };
+
+    $scope.details = {
+      hovering: false,
+      data: {
+        time: undefined,
+        temp: undefined,
+        icon: undefined,
+        descr: undefined
+      },
+
+      set: function(i) {
+        if (i !== undefined) {
+          var current = $scope.current.hourlies[i];
+          var date = new Date(current.dt * 1000);
+
+          this.hovering = true;
+          this.data.temp = current.main.temp;
+          this.data.icon = "http://openweathermap.org/img/w/" + current.weather[0].icon + ".png";
+          this.data.descr = current.weather[0].description;
+          this.data.time = ("00" + date.getHours()).slice(-2) + ":" +
+                           ("00" + date.getMinutes()).slice(-2);
+        } else {
+          this.hovering = false;
+          this.data.time = undefined;
+          this.data.temp = undefined;
+          this.data.icon = undefined;
+          this.data.descr = undefined;
+        }
+      }
     };
 
     $scope.forecast = [];
@@ -457,6 +488,13 @@ e.$validators.maxlength=function(a,c){return 0>f||e.$isEmpty(c)||c.length<=f}}}}
 
       $scope.current.hourlies = $scope.api.data.hourly.list.slice(0, 4);
 
+      $scope.current.temps = [
+        $scope.current.hourlies[0].main.temp,
+        $scope.current.hourlies[1].main.temp,
+        $scope.current.hourlies[2].main.temp,
+        $scope.current.hourlies[3].main.temp
+      ];
+
       $scope.forecast = $scope.api.data.daily.list.slice(1, 6);
 
       // Formatage des dates
@@ -481,6 +519,10 @@ e.$validators.maxlength=function(a,c){return 0>f||e.$isEmpty(c)||c.length<=f}}}}
       $scope.city = window.location.hash.split("#")[1];
       $scope.go();
     }
+
+    $scope.$on("graph.hover", function(e, idx) {
+      $scope.details.set(idx);
+    });
   }]);
 })();
 
@@ -523,82 +565,6 @@ angular.module('weather')
   return {
     restrict: 'E',
     templateUrl: 'pages/result-full.html'
-  };
-});
-
-})();
-
-(function () {
-
-/*---------------------------------
-Augmented graph v1.0
-Affiche un graphe des différentes températures de la journée qui gère le hover
----------------------------------*/
-
-angular.module('weather')
-.directive('augmentedGraph', function() {
-  return {
-    restrict: 'E',
-    type: 'svg',
-    scope: {
-      hourlies: '=',
-    },
-    templateNamespace: "svg",
-    templateUrl: 'partials/augmented-graph.svg',
-    controller: ["$scope", function($scope) {
-      $scope.dash = 604;
-      $scope.points = [];
-      $scope.pointsWidth = 3;
-      $scope.path = "";
-
-      $scope.trace = function() {
-        var min = 0, max = 0;
-
-        for(var i = 0;i < $scope.hourlies.length;i++){
-          min = Math.min(min, $scope.hourlies[i].main.temp);
-          max = Math.max(max, $scope.hourlies[i].main.temp);
-        }
-
-        var ecart = max - min;
-
-        var width, height, margin, step, pointsWidth;
-
-        // Définit la grille
-        width = 600;
-        height = 50;
-        margin = 5;
-
-        step = Math.floor(width / 3); // distance horizontale entre les points du graphe
-        max = height - margin;
-        amplitude = max - margin;
-
-        // On calcule les coordonées des 4 points du graphe
-        $scope.points = [
-          [step * 0 + margin , (max - Math.floor(($scope.hourlies[0].main.temp - min) / ecart * amplitude))],
-          [step * 1 , (max - Math.floor(($scope.hourlies[1].main.temp - min) / ecart * amplitude))],
-          [step * 2 , (max - Math.floor(($scope.hourlies[2].main.temp - min) / ecart * amplitude))],
-          [step * 3 - margin , (max - Math.floor(($scope.hourlies[3].main.temp - min) / ecart * amplitude))]
-        ];
-
-        // Ici on construit le path pour l'élément SVG qui dessine le graphe
-        var pathPoints = $scope.points.slice();
-        var depart = pathPoints.shift(); // On récupère le point de départ
-
-        // La commande M bouge le curseur aux coordonées de départ
-        // La commande C crée une courbe passant par le reste des points
-        $scope.path = "M " + depart.join(",");
-
-        for (i = 0;i < pathPoints.length;i++) {
-          $scope.path += " L " + pathPoints[i].join(",");
-        }
-      };
-
-      $scope.$on("retrace", function(e, temp) {
-        $scope.trace();
-      });
-
-      $scope.trace();
-    }]
   };
 });
 
@@ -715,14 +681,9 @@ Affiche un graphe des différentes températures de la journée
 Ne s'affiche pas sur mobile
 
 Attributs
-@ temp : un objet contenant les températures en degrés
-  @ min
-  @ max
-  @ morn
-  @ day
-  @ eve
-  @ night
+@ points : un tableau contenant 4 températures en degrés
 @ mini : si true, affiche la version réduite du graphe, sinon la version complète
+@ interactive : si true, affiche la version centrale du graphe, avec les points qui réagissent au hover
 ---------------------------------*/
 
 angular.module('weather')
@@ -732,22 +693,28 @@ angular.module('weather')
     type: 'svg',
     templateNamespace: "svg",
     scope: {
-      temp: '=',
-      mini: "="
+      temps: '=',
+      mini: "=",
+      interactive: "="
     },
     templateUrl: 'partials/temp-graph.svg',
     controller: ["$scope", function($scope) {
-      $scope.mobile = false;
       $scope.points = [];
-      $scope.pointsWidth = 3;
       $scope.path = "";
 
-      $scope.trace = function(temp) {
-        var ecart = temp.max - temp.min;
+      $scope.trace = function() {
+        var min = 0, max = 0;
+
+        for(var i = 0;i < $scope.temps.length;i++){
+          min = Math.min(min, $scope.temps[i]);
+          max = Math.max(max, $scope.temps[i]);
+        }
+
+        var ecart = max - min;
 
         var width, height, margin, step, pointsWidth;
 
-        // Définit la grille selon la valeur de l'attribut mini
+        // Définit la grille
         if ($scope.mini) {
           width = 80;
           height = 16;
@@ -763,34 +730,48 @@ angular.module('weather')
         amplitude = max - margin;
 
         // On calcule les coordonées des 4 points du graphe
-        $scope.pointsWidth = 3;
-
         $scope.points = [
-          [step * 0 + margin , (max - Math.floor((temp.morn - temp.min) / ecart * amplitude))],
-          [step * 1 , (max - Math.floor((temp.day - temp.min) / ecart * amplitude))],
-          [step * 2 , (max - Math.floor((temp.eve - temp.min) / ecart * amplitude))],
-          [step * 3 - margin , (max - Math.floor((temp.night - temp.min) / ecart * amplitude))]
+          [step * 0 + margin , (max - Math.floor(($scope.temps[0] - min) / ecart * amplitude))],
+          [step * 1 , (max - Math.floor(($scope.temps[1] - min) / ecart * amplitude))],
+          [step * 2 , (max - Math.floor(($scope.temps[2] - min) / ecart * amplitude))],
+          [step * 3 - margin , (max - Math.floor(($scope.temps[3] - min) / ecart * amplitude))]
         ];
 
         // Ici on construit le path pour l'élément SVG qui dessine le graphe
-
         var pathPoints = $scope.points.slice();
         var depart = pathPoints.shift(); // On récupère le point de départ
 
         // La commande M bouge le curseur aux coordonées de départ
         // La commande C crée une courbe passant par le reste des points
-        $scope.path = "M " + depart.join(",") + " C";
+        var suffix, prefix;
 
-        for (var i = 0;i < pathPoints.length;i++) {
-          $scope.path += " " + pathPoints[i].join(",");
+        if ($scope.interactif) {
+          suffix = "";
+          prefix = "L";
+        } else {
+          suffix = "C";
+          prefix = "";
+        }
+
+        $scope.path = "M" + depart.join(",") + " " + suffix;
+
+        for (i = 0;i < pathPoints.length;i++) {
+          $scope.path += " " + prefix + pathPoints[i].join(",");
         }
       };
 
-      $scope.$on("retrace", function(e, temp) {
-        $scope.trace(temp);
-      });
+      // $scope.$on("retrace", function(e, temp) {
+      //   $scope.trace(temp);
+      // });
+      $scope.mouseover = function(idx) {
+        $scope.$emit("graph.hover", idx);
+      };
 
-      $scope.trace($scope.temp);
+      $scope.mouseleave = function() {
+        $scope.$emit("graph.hover", undefined);
+      };
+
+      $scope.trace();
     }],
     link: function($scope, el, attr) {
       document.getElementById("test-path").setAttribute("d", $scope.path);
@@ -830,7 +811,10 @@ angular.module('weather').directive('tempWidget', function() {
       descr: "=",
       mini: "="
     },
-    templateUrl: 'partials/temp-widget.html'
+    templateUrl: 'partials/temp-widget.html',
+    controller: ["$scope", function($scope) {
+      $scope.temps = [$scope.temp.morn, $scope.temp.day, $scope.temp.eve, $scope.temp.night];
+    }]
   };
 });
 })();

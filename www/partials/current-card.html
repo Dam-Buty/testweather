@@ -1,1 +1,1 @@
-<div class=current-card><div class=temperature>{{ current.temp }}°</div><augmented-graph hourlies=current.hourlies></augmented-graph></div>
+<div class=current-card><div class=temperature>{{ current.temp }}°</div><temp-graph mini=false interactive=true temps=current.temps></temp-graph><div class=description ng-if=!details.hovering>{{ current.descr }}</div><div class=details ng-if=details.hovering>Prévision pour {{ details.data.time }} :<br><img ng-src="{{ details.data.icon }}"><br>{{ details.data.temp }}°, {{ details.data.descr }}</div></div>

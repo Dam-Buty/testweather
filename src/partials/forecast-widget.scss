@@ -40,6 +40,10 @@
 
   .container-temp {
     position: relative;
-    @include custom-temp(80px, 16px);
+
+    .temp .graph {
+      width: 80px;
+      height: 16px;
+    }
   }
 }

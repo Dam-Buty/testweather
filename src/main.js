@@ -17,7 +17,38 @@
       descr: undefined,
       state: undefined,
       day: undefined,
-      hourlies: []
+      hourlies: [],
+      temps: []
+    };
+
+    $scope.details = {
+      hovering: false,
+      data: {
+        time: undefined,
+        temp: undefined,
+        icon: undefined,
+        descr: undefined
+      },
+
+      set: function(i) {
+        if (i !== undefined) {
+          var current = $scope.current.hourlies[i];
+          var date = new Date(current.dt * 1000);
+
+          this.hovering = true;
+          this.data.temp = current.main.temp;
+          this.data.icon = "http://openweathermap.org/img/w/" + current.weather[0].icon + ".png";
+          this.data.descr = current.weather[0].description;
+          this.data.time = ("00" + date.getHours()).slice(-2) + ":" +
+                           ("00" + date.getMinutes()).slice(-2);
+        } else {
+          this.hovering = false;
+          this.data.time = undefined;
+          this.data.temp = undefined;
+          this.data.icon = undefined;
+          this.data.descr = undefined;
+        }
+      }
     };
 
     $scope.forecast = [];
@@ -207,6 +238,13 @@
 
       $scope.current.hourlies = $scope.api.data.hourly.list.slice(0, 4);
 
+      $scope.current.temps = [
+        $scope.current.hourlies[0].main.temp,
+        $scope.current.hourlies[1].main.temp,
+        $scope.current.hourlies[2].main.temp,
+        $scope.current.hourlies[3].main.temp
+      ];
+
       $scope.forecast = $scope.api.data.daily.list.slice(1, 6);
 
       // Formatage des dates
@@ -231,5 +269,9 @@
       $scope.city = window.location.hash.split("#")[1];
       $scope.go();
     }
+
+    $scope.$on("graph.hover", function(e, idx) {
+      $scope.details.set(idx);
+    });
   }]);
 })();

@@ -1,7 +1,30 @@
 <svg class="graph">
   <g id="layer1">
     <path class="strikeout" ng-attr-d="{{ path }}" ng-attr-stroke-dasharray="{{ dash }}">
-      <animate attributeName="stroke-dashoffset" ng-attr-from="{{ dash }}" to="0" dur="1s" begin="rect.click;0s"/>
+      <animate
+        attributeName="stroke-dashoffset"
+        ng-attr-from="{{ dash }}"
+        to="0"
+        dur="1s"
+        begin="rect.click;0s"/>
     </path>
   </g>
+  <circle
+    ng-repeat="point in points"
+    ng-if="interactive"
+    ng-attr-cx="{{point[0]}}"
+    ng-attr-cy="{{point[1]}}"
+    r="3" stroke="black"
+    stroke-width="1"
+    fill="none" />
+  <circle
+    ng-repeat="point in points"
+    ng-if="interactive"
+    ng-mouseenter="mouseover($index)"
+    ng-mouseleave="mouseleave()"
+    ng-attr-cx="{{point[0]}}"
+    ng-attr-cy="{{point[1]}}"
+    r="8" stroke="black"
+    stroke-width="2"
+    fill="none" />
 </svg>

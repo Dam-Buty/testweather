@@ -27,7 +27,10 @@ angular.module('weather').directive('tempWidget', function() {
       descr: "=",
       mini: "="
     },
-    templateUrl: 'partials/temp-widget.html'
+    templateUrl: 'partials/temp-widget.html',
+    controller: function($scope) {
+      $scope.temps = [$scope.temp.morn, $scope.temp.day, $scope.temp.eve, $scope.temp.night];
+    }
   };
 });
 })();
