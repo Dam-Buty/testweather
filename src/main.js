@@ -220,7 +220,10 @@
 
       // On récupère le temps actuel dans le flux "current"
       $scope.current.temp = +($scope.api.data.current.main.temp).toFixed(1);
-      $scope.current.wind = Math.floor($scope.api.data.current.wind);
+      $scope.current.wind = {
+        speed: Math.floor($scope.api.data.current.wind.speed),
+        deg: $scope.api.data.current.wind.deg
+      };
       $scope.current.descr = $scope.api.data.current.weather[0].description;
 
       // On simplifie l'état

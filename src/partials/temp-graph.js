@@ -33,15 +33,7 @@ angular.module('weather')
         $scope.traced = false;
 
         $scope.trace = function(temps) {
-          var min = 0, max = 0;
           $scope.temps = temps;
-
-          for(var i = 0;i < $scope.temps.length;i++){
-            min = Math.min(min, $scope.temps[i]);
-            max = Math.max(max, $scope.temps[i]);
-          }
-
-          var ecart = max - min;
 
           var width, height, margin, step, pointsWidth;
 
@@ -56,17 +48,43 @@ angular.module('weather')
             margin = 5;
           }
 
+          var min, max;
+
+          for(var i = 0;i < $scope.temps.length;i++){
+            if (min === undefined || max === undefined) {
+              min = $scope.temps[i];
+              max = $scope.temps[i];
+            } else {
+              min = Math.min(min, $scope.temps[i]);
+              max = Math.max(max, $scope.temps[i]);
+            }
+          }
+
+          var ecart = max - min;
+
           step = Math.floor(width / 3); // distance horizontale entre les points du graphe
           max = height - margin;
           amplitude = max - margin;
 
-          // On calcule les coordonées des 4 points du graphe
-          $scope.points = [
-            [step * 0 + margin , (max - Math.floor(($scope.temps[0] - min) / ecart * amplitude))],
-            [step * 1 , (max - Math.floor(($scope.temps[1] - min) / ecart * amplitude))],
-            [step * 2 , (max - Math.floor(($scope.temps[2] - min) / ecart * amplitude))],
-            [step * 3 - margin , (max - Math.floor(($scope.temps[3] - min) / ecart * amplitude))]
-          ];
+          if (ecart === 0) {
+            // Si il n'y a pas d'écart, on place les températures en ligne droite
+            // au milieu du graphe
+            $scope.points = [
+              [step * 0 + margin, amplitude / 2],
+              [step * 1, amplitude / 2],
+              [step * 2, amplitude / 2],
+              [step * 3 - margin, amplitude / 2]
+            ];
+          } else {
+            // On calcule les coordonées des 4 points du graphe
+            $scope.points = [
+              [step * 0 + margin , (max - Math.floor(($scope.temps[0] - min) / ecart * amplitude))],
+              [step * 1 , (max - Math.floor(($scope.temps[1] - min) / ecart * amplitude))],
+              [step * 2 , (max - Math.floor(($scope.temps[2] - min) / ecart * amplitude))],
+              [step * 3 - margin , (max - Math.floor(($scope.temps[3] - min) / ecart * amplitude))]
+            ];
+          }
+
 
           // Ici on construit le path pour l'élément SVG qui dessine le graphe
           var pathPoints = $scope.points.slice();

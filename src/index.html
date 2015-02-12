@@ -10,6 +10,8 @@
 <body ng-controller="WeatherController" ng-view>
   <front-form></front-form>
   <result-full></result-full>
+  <!-- Ce SVG invisible est utilisé pour calculer à l'avance
+  la longueur des graphes qu'on va dessiner à l'écran -->
   <svg id="test-graph" class="graph">
     <g>
       <path id="test-path" class="strikeout">
