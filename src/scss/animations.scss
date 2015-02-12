@@ -1,6 +1,18 @@
 
 /*  Rideau  */
 
+@keyframes interactive {
+    0% { opacity: 1; }
+
+    30% {  stroke: blue; }
+
+    55% { opacity: 1; }
+
+    70% {   stroke: red; }
+
+    99% { opacity: 1; }
+}
+
 @keyframes clignote {
     0% { opacity: 1; }
 

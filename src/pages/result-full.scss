@@ -15,4 +15,14 @@
     background-color: rgba(200, 200, 200, 0.75);
     border-radius: 5px;
   }
+
+  .loading {
+    opacity: 0.3;
+    filter: blur(0.5px);
+    pointer-events: none;
+
+    circle {
+      pointer-events: none;
+    }
+  }
 }

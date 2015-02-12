@@ -30,6 +30,8 @@ angular.module('weather').directive('tempWidget', function() {
     templateUrl: 'partials/temp-widget.html',
     controller: function($scope) {
       $scope.temps = [$scope.temp.morn, $scope.temp.day, $scope.temp.eve, $scope.temp.night];
+      $scope.temp.min = +($scope.temp.min).toFixed(1);
+      $scope.temp.max = +($scope.temp.max).toFixed(1);
     }
   };
 });

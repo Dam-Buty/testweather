@@ -1,7 +1,7 @@
-<section id="full" ng-show="page == 'full'" ng-if="!loading">
+<section id="full" ng-show="page == 'full'">
   <background state="current.state"></background>
   <header>{{ current.day.jour }} {{ current.day.human }} à <search-widget></search-widget></header>
-  <wind-widget deg="current.wind.deg" speed="current.wind.speed"></wind-widget>
+  <wind-widget deg="current.wind.deg" speed="current.wind.speed" ng-class="{ loading: loading }"></wind-widget>
   <current-card></current-card>
-  <forecast-widget ng-repeat="day in forecast"></forecast-widget>
+  <forecast-widget ng-repeat="day in forecast" ng-class="{ loading: loading }"></forecast-widget>
 </section>

@@ -1,30 +1,30 @@
-<svg class="graph">
-  <g id="layer1">
+<svg class="graph" ng-if="!mobile">
+  <g id="layer1" ng-if="traced">
     <path class="strikeout" ng-attr-d="{{ path }}" ng-attr-stroke-dasharray="{{ dash }}">
       <animate
         attributeName="stroke-dashoffset"
         ng-attr-from="{{ dash }}"
         to="0"
         dur="1s"
-        begin="rect.click;0s"/>
+        begin="0s"></animate>
     </path>
   </g>
   <circle
     ng-repeat="point in points"
-    ng-if="interactive"
+    ng-if="interactive && traced"
     ng-attr-cx="{{point[0]}}"
     ng-attr-cy="{{point[1]}}"
     r="3" stroke="black"
     stroke-width="1"
-    fill="none" />
+    fill="none"></circle>
   <circle
     ng-repeat="point in points"
-    ng-if="interactive"
+    ng-if="interactive && traced"
     ng-mouseenter="mouseover($index)"
     ng-mouseleave="mouseleave()"
     ng-attr-cx="{{point[0]}}"
     ng-attr-cy="{{point[1]}}"
     r="8" stroke="black"
     stroke-width="2"
-    fill="none" />
+    fill="none"></circle>
 </svg>

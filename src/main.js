@@ -7,7 +7,7 @@
     $scope.loading = false;
     $scope.page = "form";
 
-    $scope.city = "London,UK";
+    $scope.city = {name: "London,UK"};
     $scope.lat = undefined;
     $scope.lon = undefined;
 
@@ -18,7 +18,7 @@
       state: undefined,
       day: undefined,
       hourlies: [],
-      temps: []
+      temps: [0,0,0,0]
     };
 
     $scope.details = {
@@ -36,7 +36,7 @@
           var date = new Date(current.dt * 1000);
 
           this.hovering = true;
-          this.data.temp = current.main.temp;
+          this.data.temp = +(current.main.temp).toFixed(1);
           this.data.icon = "http://openweathermap.org/img/w/" + current.weather[0].icon + ".png";
           this.data.descr = current.weather[0].description;
           this.data.time = ("00" + date.getHours()).slice(-2) + ":" +
@@ -125,7 +125,7 @@
         }
 
         if (this.params.lat === "" && this.params.lon === "") {
-          this.params.q = $scope.city;
+          this.params.q = $scope.city.name;
         }
 
         return $q.all([
@@ -203,9 +203,9 @@
         "samedi"
       ];
 
-      $scope.city = $scope.api.data.daily.city.name + "," + $scope.api.data.daily.city.country;
+      $scope.city.name = $scope.api.data.daily.city.name + "," + $scope.api.data.daily.city.country;
 
-      window.location.hash = $scope.city;
+      window.location.hash = $scope.city.name;
 
       // On récupère la date
       var today = new Date();
@@ -219,8 +219,8 @@
       };
 
       // On récupère le temps actuel dans le flux "current"
-      $scope.current.temp = $scope.api.data.current.main.temp;
-      $scope.current.wind = $scope.api.data.current.wind;
+      $scope.current.temp = +($scope.api.data.current.main.temp).toFixed(1);
+      $scope.current.wind = Math.floor($scope.api.data.current.wind);
       $scope.current.descr = $scope.api.data.current.weather[0].description;
 
       // On simplifie l'état
@@ -239,10 +239,10 @@
       $scope.current.hourlies = $scope.api.data.hourly.list.slice(0, 4);
 
       $scope.current.temps = [
-        $scope.current.hourlies[0].main.temp,
-        $scope.current.hourlies[1].main.temp,
-        $scope.current.hourlies[2].main.temp,
-        $scope.current.hourlies[3].main.temp
+        +($scope.current.hourlies[0].main.temp).toFixed(1),
+        +($scope.current.hourlies[1].main.temp).toFixed(1),
+        +($scope.current.hourlies[2].main.temp).toFixed(1),
+        +($scope.current.hourlies[3].main.temp).toFixed(1)
       ];
 
       $scope.forecast = $scope.api.data.daily.list.slice(1, 6);
@@ -262,11 +262,11 @@
 
       $scope.loading = false;
 
-      // $scope.$broadcast("retrace", $scope.today.temp);
+      $scope.$broadcast("retrace", $scope.current.temps);
     };
 
     if (window.location.hash !== "") {
-      $scope.city = window.location.hash.split("#")[1];
+      $scope.city.name = window.location.hash.split("#")[1];
       $scope.go();
     }
 

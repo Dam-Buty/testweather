@@ -5,6 +5,14 @@
 
   .borne {
     padding: 0.5em;
+
+    &.min {
+      float: left;
+    }
+
+    &.max {
+      float: right;
+    }
   }
 
   .description {

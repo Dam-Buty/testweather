@@ -11,9 +11,11 @@
 
   circle {
     pointer-events: bounding-box;
+    animation: interactive 2s ease-in-out 0 infinite alternate;
 
     &:hover {
       stroke: blue;
+      animation: none;
     }
   }
 }
