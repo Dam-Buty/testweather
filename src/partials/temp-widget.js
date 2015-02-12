@@ -1,7 +1,7 @@
 (function () {
 
 /*---------------------------------
-Temp widget v1.0
+Temp widget v1.1
 Affiche les températures min et max ainsi que le graphe
 
 Dépend de :

@@ -1,5 +1,12 @@
 # Changelog
 
+v0.7 :
+========
+
+- Refonte de la carte centrale et des forecasts
+- Utilisation des 3 différents flux de l'API
+- Evolution de la directive graph : calcul automatique des coups de pinceau
+
 v0.6.1 :
 ========
 

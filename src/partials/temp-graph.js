@@ -1,8 +1,8 @@
 (function () {
 
 /*---------------------------------
-Temp graph v1.0
-Affiche un graphe des différentes températures de la journée
+Temp graph v2.0
+Affiche un graphe à partir de 4 points
 Ne s'affiche pas sur mobile
 
 Attributs

@@ -679,8 +679,8 @@ angular.module('weather')
 (function () {
 
 /*---------------------------------
-Temp graph v1.0
-Affiche un graphe des différentes températures de la journée
+Temp graph v2.0
+Affiche un graphe à partir de 4 points
 Ne s'affiche pas sur mobile
 
 Attributs
@@ -818,7 +818,7 @@ angular.module('weather')
 (function () {
 
 /*---------------------------------
-Temp widget v1.0
+Temp widget v1.1
 Affiche les températures min et max ainsi que le graphe
 
 Dépend de :
